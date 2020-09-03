@@ -1,0 +1,27 @@
+cache:
+  paths:
+    - ccache/
+
+before_script:
+ - apt update >/dev/null && apt install -y git >/dev/null
+ - git clone https://gitlab.com/VictorLamoine/ros_gitlab_ci.git
+ - source ros_gitlab_ci/gitlab-ci.bash >/dev/null
+
+kinetic_catkin_tests:
+  image: ros:kinetic-robot
+  stage: test
+  script:
+    - catkin run_tests --no-status --force-color
+
+melodic_catkin_tests:
+  image: ros:melodic-robot
+  stage: test
+  script:
+    - catkin run_tests --no-status --force-color
+
+# noetic
+noetic_catkin_build:
+  image: ros:noetic-robot
+  stage: build
+  script:
+    - catkin run_tests --no-status --force-color
