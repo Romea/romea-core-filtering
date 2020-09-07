@@ -18,13 +18,25 @@ kinetic_catkin_tests:
 
 melodic_catkin_tests:
   image: ros:melodic-robot
-  stage: test
+  stage: build
+  before_script:
+   - apt update >/dev/null && apt install -y git >/dev/null
+   - git clone https://gitlab.com/VictorLamoine/ros_gitlab_ci.git
+   - source ros_gitlab_ci/gitlab-ci.bash >/dev/null
+   - apt-get install -y -qq libgtest-dev
+   - (cd /usr/src/gtest; cmake . && make && cp *.a /usr/lib/)
   script:
-    - catkin run_tests romea_filtering --no-status --force-color --cmake-args -DBUILD_TEST=ON
+    - catkin build romea_filtering --cmake-args -DBUILD_TESTS=ON
+    - catkin test romea_filtering
 
 # noetic
 noetic_catkin_build:
   image: ros:noetic-robot
   stage: test
+  before_script:
+   - apt update >/dev/null && apt install -y git >/dev/null
+   - git clone https://gitlab.com/VictorLamoine/ros_gitlab_ci.git
+   - source ros_gitlab_ci/gitlab-ci.bash >/dev/null
   script:
-    - catkin run_tests romea_filtering --no-status --force-color --cmake-args -DBUILD_TEST=ON
+    - catkin build romea_filtering --cmake-args -DBUILD_TESTS=ON
+    - catkin test romea_filtering
