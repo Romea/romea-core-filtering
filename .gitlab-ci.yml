@@ -12,7 +12,6 @@ kinetic_catkin_tests:
   stage: build
   script:
     - catkin build romea_filtering --cmake-args -DBUILD_TESTS=ON
-    - catkin test romea_filtering
 
 melodic_catkin_tests:
   image: ros:melodic-robot
