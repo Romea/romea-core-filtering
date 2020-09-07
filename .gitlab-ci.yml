@@ -9,9 +9,10 @@ before_script:
 
 kinetic_catkin_tests:
   image: ros:kinetic-robot
-  stage: test
+  stage: build
   script:
-    - catkin run_tests romea_filtering --no-status --force-color --cmake-args -DBUILD_TEST=ON
+    - catkin build romea_filtering --cmake-args -DBUILD_TESTS=ON
+    - catkin test romea_filtering
 
 melodic_catkin_tests:
   image: ros:melodic-robot
@@ -22,6 +23,6 @@ melodic_catkin_tests:
 # noetic
 noetic_catkin_build:
   image: ros:noetic-robot
-  stage: build
+  stage: test
   script:
     - catkin run_tests romea_filtering --no-status --force-color --cmake-args -DBUILD_TEST=ON
