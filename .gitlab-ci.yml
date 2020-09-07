@@ -24,4 +24,4 @@ noetic_catkin_build:
   image: ros:noetic-robot
   stage: build
   script:
-    - catkin run_tests romea_filtering --no-status --force-color --cmake-args DBUILD_TEST=ON
+    - catkin run_tests romea_filtering --no-status --force-color --cmake-args -DBUILD_TEST=ON
