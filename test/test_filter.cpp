@@ -97,7 +97,7 @@ public:
 
     EXPECT_EQ(currentstate.computedElapsedTime.count(),currentObservation.duration.count());
     EXPECT_EQ(currentstate.computedElapsedTime.count(),duration.count());
-    EXPECT_EQ(currentFsmState,TimeFSMState::RUN);
+    EXPECT_EQ(currentFsmState,TimeFSMState::INIT);
 
   }
 };
