@@ -18,6 +18,11 @@
 
 namespace romea {
 
+enum FilterType
+{
+  KALMAN,
+  PARTICLE
+};
 
 template <class State , class FSMState, class Duration>
 class Filter{
