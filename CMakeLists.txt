@@ -20,7 +20,6 @@ target_include_directories(
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
             ${EIGEN3_INCLUDE_DIRS})
 
-
 #target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
 #target_link_libraries(${PROJECT_NAME} INTERFACE ${EIGEN3_LIBRARIES})
 
