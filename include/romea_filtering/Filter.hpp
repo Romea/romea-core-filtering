@@ -1,5 +1,5 @@
-#ifndef romea_BayesianFilter_hpp
-#define romea_BayesianFilter_hpp
+#ifndef romea_Filter_hpp
+#define romea_Filter_hpp
 
 //std
 #include <functional>
@@ -15,14 +15,9 @@
 #include "FilterMetaState.hpp"
 #include "FilterPredictor.hpp"
 #include "FilterUpdater.hpp"
+#include "FilterType.hpp"
 
 namespace romea {
-
-enum FilterType
-{
-  KALMAN,
-  PARTICLE
-};
 
 template <class State , class FSMState, class Duration>
 class Filter{
