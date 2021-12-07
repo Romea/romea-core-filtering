@@ -5,9 +5,9 @@
 #include <chrono>
 
 //romea
-#include "romea_filtering/Filter.hpp"
-#include "romea_filtering/FilterPredictor.hpp"
-#include "romea_filtering/FilterUpdater.hpp"
+#include "romea_core_filtering/Filter.hpp"
+#include "romea_core_filtering/FilterPredictor.hpp"
+#include "romea_core_filtering/FilterUpdater.hpp"
 
 using Duration =std::chrono::duration<long long int ,std::nano>;
 

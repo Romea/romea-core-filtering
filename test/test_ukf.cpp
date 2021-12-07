@@ -1,7 +1,7 @@
 // gtest
 #include <gtest/gtest.h>
 
-#include "romea_filtering/kalman/UnscentedKalmanFilterUpdaterCore.hpp"
+#include "romea_core_filtering/kalman/UnscentedKalmanFilterUpdaterCore.hpp"
 
 TEST(testUKF, testUnscentedTransform)
 {
