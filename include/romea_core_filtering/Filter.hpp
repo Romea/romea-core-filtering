@@ -231,7 +231,7 @@ void Filter<State,FSMState,Duration>::process(const Duration & duration,
                           currentFSMState,
                           *currentState);
 
-      currentFSMState = previousFSMState;
+//      currentFSMState = previousFSMState;
 
     }
 
