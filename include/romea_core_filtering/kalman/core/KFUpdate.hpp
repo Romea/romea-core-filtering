@@ -1,9 +1,9 @@
-#ifndef romea_KalmanUpdate_hpp
-#define romea_KalmanUpdate_hpp
+#ifndef ROMEA_CORE_FILTERING_KALMAN_CORE_KFUPDATE_HPP_
+#define ROMEA_CORE_FILTERING_KALMAN_CORE_KFUPDATE_HPP_
 
-//romea
-#include "../../GaussianState.hpp"
-#include "KFUpdaterTraits.hpp"
+// romea
+#include "romea_core_filtering/GaussianState.hpp"
+#include "romea_core_filtering/kalman/core/KFUpdaterTraits.hpp"
 
 namespace romea {
 
@@ -12,11 +12,11 @@ namespace romea {
 template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
 struct KFUpdateStateVector
 {
-  static void compute(typename KFUpdaterTraits<Scalar,StateDIM,ObservationDIM>::X & X,
-                      const typename KFUpdaterTraits<Scalar,StateDIM,ObservationDIM>::Inn & Inn,
-                      const typename KFUpdaterTraits<Scalar,StateDIM,ObservationDIM>::K & K)
+  static void compute(typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::X & X,
+                      const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn & Inn,
+                      const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K & K)
   {
-    X+=K*Inn;
+    X += K*Inn;
   }
 };
 
@@ -24,30 +24,27 @@ struct KFUpdateStateVector
 template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
 struct KFUpdateStateCovariance
 {
-
-  static void compute(typename KFUpdaterTraits<Scalar,StateDIM,ObservationDIM>::P & P,
-                      const typename KFUpdaterTraits<Scalar,StateDIM,ObservationDIM>::QInn & QInn,
-                      const typename KFUpdaterTraits<Scalar,StateDIM,ObservationDIM>::K & K)
+  static void compute(typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::P & P,
+                      const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn & QInn,
+                      const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K & K)
   {
-    P-=K*QInn*K.transpose();
+    P -= K*QInn*K.transpose();
   }
 };
 
 
 //-----------------------------------------------------------------------------
 template <typename Scalar>
-struct KFUpdateStateCovariance<Scalar,1,1>
+struct KFUpdateStateCovariance<Scalar, 1, 1>
 {
   static void compute(Scalar & P,
                       const Scalar & QInn,
                       const Scalar & K)
   {
-    P-=K*QInn*K;
+    P -= K*QInn*K;
   }
 };
 
+}  // namespace romea
 
-}
-
-
-#endif
+#endif  // ROMEA_CORE_FILTERING_KALMAN_CORE_KFUPDATE_HPP_

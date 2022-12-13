@@ -1,44 +1,44 @@
-#ifndef romea_PFUpdaterCore_hpp
-#define romea_PFUpdaterCore_hpp
+#ifndef ROMEA_CORE_FILTERING_PARTICLE_PARTICLEFILTERUPDATERCORE_HPP_
+#define ROMEA_CORE_FILTERING_PARTICLE_PARTICLEFILTERUPDATERCORE_HPP_
 
-//romea
-#include "ParticleFilterState.hpp"
-#include "ParticleFilterResampling.hpp"
-
-//eigen
+// eigen
 #include <Eigen/Core>
+
+// romea
+#include "romea_core_filtering/particle/ParticleFilterState.hpp"
+#include "romea_core_filtering/particle/ParticleFilterResampling.hpp"
+
 
 namespace romea {
 
 template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
 class PFUpdaterCore
 {
+public :
+
+  using RowMajorVector = Eigen::Array<Scalar, 1, Eigen::Dynamic>;
 
 public :
 
-  using RowMajorVector = Eigen::Array<Scalar,1,Eigen::Dynamic>;
+  explicit PFUpdaterCore(const std::size_t & numberOfParticles);
 
-public :
-
-  PFUpdaterCore(const std::size_t & numberOfParticles);
-
-  virtual ~PFUpdaterCore()=default;
+  virtual ~PFUpdaterCore() = default;
 
 protected :
 
   size_t numberOfParticles_;
-  ParticleFilterResampling<Scalar,StateDIM> resampling_;
+  ParticleFilterResampling<Scalar, StateDIM> resampling_;
 };
 
 //-----------------------------------------------------------------------------
 template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-PFUpdaterCore<Scalar,StateDIM,ObservationDIM>::PFUpdaterCore(const std::size_t &numberOfParticles):
+PFUpdaterCore<Scalar, StateDIM, ObservationDIM>::
+PFUpdaterCore(const std::size_t &numberOfParticles):
   numberOfParticles_(numberOfParticles),
   resampling_(numberOfParticles)
 {
-
 }
 
-}
+}  // namespace romea
 
-#endif
+#endif  // ROMEA_CORE_FILTERING_PARTICLE_PARTICLEFILTERUPDATERCORE_HPP_

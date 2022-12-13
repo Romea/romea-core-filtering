@@ -1,26 +1,31 @@
-#ifndef romea_BayesianFilterMetaState_hpp
-#define romea_BayesianFilterMetaState_hpp
+#ifndef INCLUDE_ROMEA_CORE_FILTERING_FILTERMETASTATE_HPP_
+#define INCLUDE_ROMEA_CORE_FILTERING_FILTERMETASTATE_HPP_
 
-//romea
-#include "FilterUpdater.hpp"
-
-//std
+// std
 #include <memory>
 #include <functional>
+#include <utility>
+
+// romea
+#include "romea_core_filtering/FilterUpdater.hpp"
+
 
 namespace romea {
-
-
 
 template <class State , class FSMState, class Duration>
 struct FilterMetaState
 {
-
 public :
 
-  using UpdateFunction =std::function<void(const Duration &, FSMState &, State&)> ;
+  using UpdateFunction = std::function<void(const Duration &,
+                                            FSMState &,
+                                            State&)> ;
 
-  using PredictFunction = std::function<void(const Duration &, const FSMState &, const State&, const Duration &, FSMState &, State &)> ;
+  using PredictFunction = std::function<void(const Duration &,
+                                             const FSMState &,
+                                             const State&,
+                                             const Duration &,
+                                             FSMState &, State &)> ;
 
 public :
 
@@ -33,7 +38,6 @@ public :
     state(std::move(state)),
     update(std::move(update))
   {
-
   }
 
   Duration duration;
@@ -42,7 +46,6 @@ public :
   UpdateFunction update;
 };
 
+}  // namespace romea
 
-
-}
-#endif
+#endif  // INCLUDE_ROMEA_CORE_FILTERING_FILTERMETASTATE_HPP_

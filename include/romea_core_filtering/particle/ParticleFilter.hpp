@@ -1,37 +1,38 @@
-#ifndef romea_ParticleFilter_hpp
-#define romea_ParticleFilter_hpp
+#ifndef ROMEA_CORE_FILTERING_PARTICLE_PARTICLEFILTER_HPP_
+#define ROMEA_CORE_FILTERING_PARTICLE_PARTICLEFILTER_HPP_
 
-//Eigen
+// Eigen
 #include <Eigen/Core>
 
-//romea
-#include "../Filter.hpp"
-
-//std
+// std
 #include <algorithm>
 #include <memory>
+#include <utility>
+
+// romea
+#include "romea_core_filtering/Filter.hpp"
+
 
 namespace romea {
 
 template < class State, class FSMState, class Duration>
-class ParticleFilter : public Filter<State,FSMState,Duration>
+class ParticleFilter : public Filter<State, FSMState, Duration>
 {
-
 public :
 
   ParticleFilter(const size_t & statePoolSize,
                  const size_t & numberOfParticles):
-    Filter<State,FSMState,Duration>(statePoolSize),
+    Filter<State, FSMState, Duration>(statePoolSize),
     numberOfParticles_(0)
   {
-    for(size_t n=0;n<statePoolSize;++n)
+    for (size_t n = 0; n < statePoolSize; ++n)
     {
       std::unique_ptr<State> state(new State(numberOfParticles));
       this->stateVectorPool_.push_back(std::move(state));
     }
   }
 
-  virtual ~ParticleFilter()=default;
+  virtual ~ParticleFilter() = default;
 
   virtual size_t getNumberOfParticles() const
   {
@@ -41,11 +42,8 @@ public :
 private :
 
   size_t numberOfParticles_;
-
 };
 
+}  // namespace romea
 
-
-}
-
-#endif
+#endif  // ROMEA_CORE_FILTERING_PARTICLE_PARTICLEFILTER_HPP_

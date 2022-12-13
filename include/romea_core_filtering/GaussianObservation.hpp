@@ -1,31 +1,29 @@
-#ifndef romea_GaussianObservation_hpp
-#define romea_GaussianObservation_hpp
+#ifndef ROMEA_CORE_FILTERING_GAUSSIANOBSERVATION_HPP_
+#define ROMEA_CORE_FILTERING_GAUSSIANOBSERVATION_HPP_
 
 
-#include "GaussianDistribution.hpp"
+#include "romea_core_filtering/GaussianDistribution.hpp"
 
 
 namespace romea {
 
 
-template<typename Scalar,size_t DIM >
-struct GaussianObservation : GaussianDistribution<Scalar,DIM>
+template<typename Scalar, size_t DIM >
+struct GaussianObservation : GaussianDistribution<Scalar, DIM>
 {
-
   GaussianObservation():
-    GaussianDistribution<Scalar,DIM>()
+    GaussianDistribution<Scalar, DIM>()
   {
-
   }
 
-  virtual ~GaussianObservation()=default;
+  virtual ~GaussianObservation() = default;
 
-  typename GaussianDistribution<Scalar,DIM>::FirstMoment & Y()
+  typename GaussianDistribution<Scalar, DIM>::FirstMoment & Y()
   {
     return this->firstMoment;
   }
 
-  const typename GaussianDistribution<Scalar,DIM>::FirstMoment & Y()const
+  const typename GaussianDistribution<Scalar, DIM>::FirstMoment & Y()const
   {
     return this->firstMoment;
   }
@@ -40,27 +38,27 @@ struct GaussianObservation : GaussianDistribution<Scalar,DIM>
     return this->firstMoment(i);
   }
 
-  typename GaussianDistribution<Scalar,DIM>::SecondMoment & R()
+  typename GaussianDistribution<Scalar, DIM>::SecondMoment & R()
   {
     return this->secondMoment;
   }
 
-  const typename GaussianDistribution<Scalar,DIM>::SecondMoment & R()const
+  const typename GaussianDistribution<Scalar, DIM>::SecondMoment & R()const
   {
     return this->secondMoment;
   }
 
   const Scalar & R(const size_t & i, const size_t &j)const
   {
-    return this->secondMoment(i,j);
+    return this->secondMoment(i, j);
   }
 
   Scalar & R(const size_t & i, const size_t &j)
   {
-    return this->secondMoment(i,j);
+    return this->secondMoment(i, j);
   }
 };
 
-}//romea
+}  // namespace romea
 
-#endif
+#endif  // ROMEA_CORE_FILTERING_GAUSSIANOBSERVATION_HPP_

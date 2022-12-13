@@ -1,28 +1,26 @@
-#ifndef romea_GaussianState_hpp
-#define romea_GaussianState_hpp
+#ifndef ROMEA_CORE_FILTERING_GAUSSIANSTATE_HPP_
+#define ROMEA_CORE_FILTERING_GAUSSIANSTATE_HPP_
 
-#include "GaussianDistribution.hpp"
+#include "romea_core_filtering/GaussianDistribution.hpp"
 
 namespace romea {
 
-template<typename Scalar,size_t DIM >
-struct GaussianState : GaussianDistribution<Scalar,DIM>
+template<typename Scalar, size_t DIM >
+struct GaussianState : GaussianDistribution<Scalar, DIM>
 {
-
   GaussianState():
-    GaussianDistribution<Scalar,DIM>()
+    GaussianDistribution<Scalar, DIM>()
   {
-
   }
 
-  virtual ~GaussianState()=default;
+  virtual ~GaussianState() = default;
 
-  typename GaussianDistribution<Scalar,DIM>::FirstMoment & X()
+  typename GaussianDistribution<Scalar, DIM>::FirstMoment & X()
   {
     return this->firstMoment;
   }
 
-  const typename GaussianDistribution<Scalar,DIM>::FirstMoment & X()const
+  const typename GaussianDistribution<Scalar, DIM>::FirstMoment & X()const
   {
     return this->firstMoment;
   }
@@ -37,25 +35,24 @@ struct GaussianState : GaussianDistribution<Scalar,DIM>
     return this->firstMoment(i);
   }
 
-
-  typename GaussianDistribution<Scalar,DIM>::SecondMoment & P()
+  typename GaussianDistribution<Scalar, DIM>::SecondMoment & P()
   {
     return this->secondMoment;
   }
 
-  const typename GaussianDistribution<Scalar,DIM>::SecondMoment & P()const
+  const typename GaussianDistribution<Scalar, DIM>::SecondMoment & P()const
   {
     return this->secondMoment;
   }
 
   const Scalar & P(const size_t & i, const size_t &j)const
   {
-    return this->secondMoment(i,j);
+    return this->secondMoment(i, j);
   }
 
   Scalar & P(const size_t & i, const size_t &j)
   {
-    return this->secondMoment(i,j);
+    return this->secondMoment(i, j);
   }
 
 
@@ -64,11 +61,8 @@ struct GaussianState : GaussianDistribution<Scalar,DIM>
     this->firstMoment.setConstant(NAN);
     this->secondMoment.setZero();
   }
-
 };
 
+}  // namespace romea
 
-
-}//romea
-
-#endif
+#endif  // ROMEA_CORE_FILTERING_GAUSSIANSTATE_HPP_

@@ -1,32 +1,33 @@
-#ifndef romea_KalmanFilter_hpp
-#define romea_KalmanFilter_hpp
+#ifndef ROMEA_CORE_FILTERING_KALMAN_KALMANFILTER_HPP_
+#define ROMEA_CORE_FILTERING_KALMAN_KALMANFILTER_HPP_
 
-//romea
-#include "../Filter.hpp"
+// std
+#include <memory>
+#include <utility>
+
+// romea
+#include "romea_core_filtering/Filter.hpp"
 
 namespace romea {
 
 template < class State , class FSMState, class Duration>
-class KalmanFilter : public Filter<State,FSMState,Duration>
+class KalmanFilter : public Filter<State, FSMState, Duration>
 {
-
 public :
 
-  KalmanFilter(const size_t statePoolSize):
-    Filter<State,FSMState,Duration>(statePoolSize)
+  explicit KalmanFilter(const size_t statePoolSize):
+    Filter<State, FSMState, Duration>(statePoolSize)
   {
-    for(size_t n=0;n<statePoolSize;++n)
+    for (size_t n = 0; n < statePoolSize; ++n)
     {
       std::unique_ptr<State> state(new State());
       this->stateVectorPool_.push_back(std::move(state));
     }
   }
 
-  virtual ~KalmanFilter()=default;
-
-
+  virtual ~KalmanFilter() = default;
 };
 
-}//romea
+}  // namespace romea
 
-#endif
+#endif  // ROMEA_CORE_FILTERING_KALMAN_KALMANFILTER_HPP_

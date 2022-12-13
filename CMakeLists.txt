@@ -9,8 +9,9 @@ project(
 
 set(CMAKE_CXX_STANDARD 14)
 
-find_package( PkgConfig )
-pkg_check_modules( EIGEN3 REQUIRED eigen3 )
+# find_package( PkgConfig )
+# pkg_check_modules( EIGEN3 REQUIRED eigen3 )
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
@@ -60,14 +61,14 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}
 
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 
-
 include_directories(include  ${EIGEN3_INCLUDE_DIRS})
 
-option(BUILD_TESTS "BUILD WITH TESTS" OFF)
-if(BUILD_TESTS)
+option(BUILD_TESTING "BUILD WITH TESTS" ON)
+
+if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(test)
-endif(BUILD_TESTS)
+endif(BUILD_TESTING)
 
 
 

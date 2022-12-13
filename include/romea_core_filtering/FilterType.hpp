@@ -1,5 +1,5 @@
-#ifndef romea_FilterType_hpp
-#define romea_FilterType_hpp
+#ifndef ROMEA_CORE_FILTERING_FILTERTYPE_HPP_
+#define ROMEA_CORE_FILTERING_FILTERTYPE_HPP_
 
 
 namespace romea {
@@ -10,6 +10,6 @@ enum FilterType
   PARTICLE
 };
 
-}//romea
+}  // namespace romea
 
-#endif
+#endif  // ROMEA_CORE_FILTERING_FILTERTYPE_HPP_

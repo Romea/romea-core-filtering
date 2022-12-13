@@ -1,42 +1,39 @@
-#ifndef romea_GaussianDistribution_hpp
-#define romea_GaussianDistribution_hpp
+#ifndef ROMEA_CORE_FILTERING_GAUSSIANDISTRIBUTION_HPP_
+#define ROMEA_CORE_FILTERING_GAUSSIANDISTRIBUTION_HPP_
 
-//Eigen
+// Eigen
 #include <Eigen/Core>
 
-//std
+// std
 #include <vector>
 
 namespace romea {
 
-template<typename Scalar,size_t DIM >
+template<typename Scalar, size_t DIM >
 struct GaussianDistribution
 {
-
-  using FirstMoment = Eigen::Matrix<Scalar,DIM,1>;
-  using SecondMoment = Eigen::Matrix<Scalar,DIM,DIM>;
-  using SigmaPoints = std::vector<FirstMoment,Eigen::aligned_allocator<FirstMoment>>;
+  using FirstMoment = Eigen::Matrix<Scalar, DIM, 1>;
+  using SecondMoment = Eigen::Matrix<Scalar, DIM, DIM>;
+  using SigmaPoints = std::vector<FirstMoment, Eigen::aligned_allocator<FirstMoment>>;
 
   GaussianDistribution():
     firstMoment(FirstMoment::Constant(NAN)),
     secondMoment(SecondMoment::Zero())
   {
-
   }
 
-  virtual ~GaussianDistribution()=default;
+  virtual ~GaussianDistribution() = default;
 
   FirstMoment firstMoment;
   SecondMoment secondMoment;
 
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(Scalar,DIM)
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(Scalar, DIM)
 };
 
 
 template<typename Scalar>
-struct GaussianDistribution<Scalar,1>
+struct GaussianDistribution<Scalar, 1>
 {
-
   using FirstMoment = Scalar;
   using SecondMoment = Scalar;
   using SigmaPoints = std::vector<Scalar>;
@@ -46,10 +43,9 @@ struct GaussianDistribution<Scalar,1>
     firstMoment(NAN),
     secondMoment(0)
   {
-
   }
 
-  virtual ~GaussianDistribution()=default;
+  virtual ~GaussianDistribution() = default;
 
   FirstMoment firstMoment;
   SecondMoment secondMoment;
@@ -101,6 +97,6 @@ struct GaussianDistribution<Scalar,1>
 
 
 
-}//romea
+}  // namespace romea
 
-#endif
+#endif  // ROMEA_CORE_FILTERING_GAUSSIANDISTRIBUTION_HPP_
