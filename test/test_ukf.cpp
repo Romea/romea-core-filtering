@@ -7,7 +7,7 @@
 // std
 #include <vector>
 
-//romea
+// romea
 #include "romea_core_filtering/kalman/UnscentedKalmanFilterUpdaterCore.hpp"
 
 TEST(testUKF, testUnscentedTransform)
