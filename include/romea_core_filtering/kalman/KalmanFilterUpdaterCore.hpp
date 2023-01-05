@@ -1,5 +1,8 @@
-#ifndef ROMEA_CORE_FILTERING_KALMAN_KALMANFILTERUPDATERCORE_HPP_ 
-#define ROMEA_CORE_FILTERING_KALMAN_KALMANFILTERUPDATERCORE_HPP_ 
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
+#ifndef ROMEA_CORE_FILTERING__KALMAN__KALMANFILTERUPDATERCORE_HPP_
+#define ROMEA_CORE_FILTERING__KALMAN__KALMANFILTERUPDATERCORE_HPP_
 
 // std
 #include <limits>
@@ -11,18 +14,18 @@
 #include "romea_core_filtering/kalman/core/KFMahalanobis.hpp"
 #include "romea_core_filtering/GaussianState.hpp"
 
-namespace romea {
+namespace romea
+{
 
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 class KFUpdaterCore
 {
-public :
+public:
   using State = GaussianState<Scalar, StateDIM>;
 
-public :
-
-  explicit KFUpdaterCore(const Scalar & maximalMahalanobisDistance):
-    Inn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn>::zero()),
+public:
+  explicit KFUpdaterCore(const Scalar & maximalMahalanobisDistance)
+  : Inn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn>::zero()),
     QInn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn>::zero()),
     QInnInverse_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn>::zero()),
     H_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::H>::zero()),
@@ -40,8 +43,7 @@ protected:
     mahalanobisDistance_ = KFMahalanobis<Scalar, ObservationDIM>::
       compute(Inn_, QInn_, QInnInverse_);
 
-    if ( mahalanobisDistance_ < maximalMahalanobisDistance_)
-    {
+    if (mahalanobisDistance_ < maximalMahalanobisDistance_) {
       KFGain<Scalar, StateDIM, ObservationDIM>::compute(state.P(), H_, QInnInverse_, K_);
       KFUpdateStateVector<Scalar, StateDIM, ObservationDIM>::compute(state.X(), Inn_, K_);
       KFUpdateStateCovariance<Scalar, StateDIM, ObservationDIM>::compute(state.P(), QInn_, K_);
@@ -51,8 +53,7 @@ protected:
     }
   }
 
-protected :
-
+protected:
   typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn Inn_;
   typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn QInn_;
   typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn QInnInverse_;
@@ -64,4 +65,4 @@ protected :
 
 }  // namespace romea
 
-#endif  // ROMEA_CORE_FILTERING_KALMAN_KALMANFILTERUPDATERCORE_HPP_ 
+#endif  // ROMEA_CORE_FILTERING__KALMAN__KALMANFILTERUPDATERCORE_HPP_

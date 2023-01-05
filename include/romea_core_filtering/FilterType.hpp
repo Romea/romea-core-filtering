@@ -1,8 +1,12 @@
-#ifndef ROMEA_CORE_FILTERING_FILTERTYPE_HPP_
-#define ROMEA_CORE_FILTERING_FILTERTYPE_HPP_
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
+#ifndef ROMEA_CORE_FILTERING__FILTERTYPE_HPP_
+#define ROMEA_CORE_FILTERING__FILTERTYPE_HPP_
 
 
-namespace romea {
+namespace romea
+{
 
 enum FilterType
 {
@@ -12,4 +16,4 @@ enum FilterType
 
 }  // namespace romea
 
-#endif  // ROMEA_CORE_FILTERING_FILTERTYPE_HPP_
+#endif  // ROMEA_CORE_FILTERING__FILTERTYPE_HPP_

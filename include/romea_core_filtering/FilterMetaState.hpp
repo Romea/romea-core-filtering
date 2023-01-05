@@ -1,5 +1,8 @@
-#ifndef INCLUDE_ROMEA_CORE_FILTERING_FILTERMETASTATE_HPP_
-#define INCLUDE_ROMEA_CORE_FILTERING_FILTERMETASTATE_HPP_
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
+#ifndef INCLUDE_ROMEA_CORE__FILTERING__FILTERMETASTATE_HPP_
+#define INCLUDE_ROMEA_CORE__FILTERING__FILTERMETASTATE_HPP_
 
 // std
 #include <memory>
@@ -10,33 +13,33 @@
 #include "romea_core_filtering/FilterUpdater.hpp"
 
 
-namespace romea {
+namespace romea
+{
 
-template <class State , class FSMState, class Duration>
+template<class State, class FSMState, class Duration>
 struct FilterMetaState
 {
-public :
+public:
+  using UpdateFunction = std::function<void (const Duration &,
+      FSMState &,
+      State &)>;
 
-  using UpdateFunction = std::function<void(const Duration &,
-                                            FSMState &,
-                                            State&)> ;
+  using PredictFunction = std::function<void (const Duration &,
+      const FSMState &,
+      const State &,
+      const Duration &,
+      FSMState &, State &)>;
 
-  using PredictFunction = std::function<void(const Duration &,
-                                             const FSMState &,
-                                             const State&,
-                                             const Duration &,
-                                             FSMState &, State &)> ;
+public:
+  FilterMetaState(
+    const Duration & duration,
+    std::unique_ptr<State> state,
+    UpdateFunction && update) :
 
-public :
-
-  FilterMetaState(const Duration & duration,
-                  std::unique_ptr<State> state,
-                  UpdateFunction && update):
-
-    duration(duration),
-    fsmState(),
-    state(std::move(state)),
-    update(std::move(update))
+  duration(duration),
+  fsmState(),
+  state(std::move(state)),
+  update(std::move(update))
   {
   }
 
@@ -48,4 +51,4 @@ public :
 
 }  // namespace romea
 
-#endif  // INCLUDE_ROMEA_CORE_FILTERING_FILTERMETASTATE_HPP_
+#endif  // INCLUDE_ROMEA_CORE__FILTERING__FILTERMETASTATE_HPP_

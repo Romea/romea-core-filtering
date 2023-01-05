@@ -1,16 +1,22 @@
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
 // gtest
 #include <gtest/gtest.h>
 
+// std
+#include <vector>
+
+//romea
 #include "romea_core_filtering/kalman/UnscentedKalmanFilterUpdaterCore.hpp"
 
 TEST(testUKF, testUnscentedTransform)
 {
-
   using StateSigmaPoints = std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>;
   using ObservationSigmaPoints = std::vector<double>;
 
   romea::GaussianState<double, 3> state;
-  state.X() << 10.0401196 , -6.541962718, 5.773763097;
+  state.X() << 10.0401196, -6.541962718, 5.773763097;
   state.P().row(0) << 0.003713927914, 0.004473035868, 0.003144414499;
   state.P().row(1) << 0.004473035868, 0.009133254681, 0.005490835273;
   state.P().row(2) << 0.003144414499, 0.005490835273, 0.005852381092;
@@ -20,9 +26,9 @@ TEST(testUKF, testUnscentedTransform)
   const double UNSCENTED_TRANSFORM_BETA = 2;
 
   romea::UnscentedTransformParameters<double> params(3,
-                                                     UNSCENTED_TRANSFORM_KAPPA,
-                                                     UNSCENTED_TRANSFORM_ALPHA,
-                                                     UNSCENTED_TRANSFORM_BETA);
+    UNSCENTED_TRANSFORM_KAPPA,
+    UNSCENTED_TRANSFORM_ALPHA,
+    UNSCENTED_TRANSFORM_BETA);
 
   StateSigmaPoints stateSigmaPoints(7);
   romea::UnscentedTransformFoward<double, 3>::toSigmaPoints(params, state, stateSigmaPoints);
@@ -60,18 +66,19 @@ TEST(testUKF, testUnscentedTransform)
 
   romea::GaussianObservation<double, 1> propagatedState;
   romea::UnscentedTransformInverse<double, 1>::
-    toGaussian(params, propagatedSigmaPoints, propagatedState);
+  toGaussian(params, propagatedSigmaPoints, propagatedState);
 
   EXPECT_NEAR(propagatedState.Y(), 11.07642123, 0.01);
   EXPECT_NEAR(propagatedState.R(), 0.002285136065, 0.01);
 
   Eigen::Matrix<double, 3, 1> propagationCorrelation(3, 1);
-  romea::UKFCorrelation<double, 3, 1>::compute(params,
-                                              state,
-                                              propagatedState,
-                                              stateSigmaPoints,
-                                              propagatedSigmaPoints,
-                                              propagationCorrelation);
+  romea::UKFCorrelation<double, 3, 1>::compute(
+    params,
+    state,
+    propagatedState,
+    stateSigmaPoints,
+    propagatedSigmaPoints,
+    propagationCorrelation);
 
   EXPECT_NEAR(propagationCorrelation(0, 0), 0.002835369261, 0.01);
   EXPECT_NEAR(propagationCorrelation(1, 0), 0.0027504505, 0.01);
@@ -79,7 +86,8 @@ TEST(testUKF, testUnscentedTransform)
 }
 
 //-----------------------------------------------------------------------------
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

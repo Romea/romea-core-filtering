@@ -1,18 +1,22 @@
-#ifndef ROMEA_CORE_FILTERING_GAUSSIANOBSERVATION_HPP_
-#define ROMEA_CORE_FILTERING_GAUSSIANOBSERVATION_HPP_
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
+#ifndef ROMEA_CORE_FILTERING__GAUSSIANOBSERVATION_HPP_
+#define ROMEA_CORE_FILTERING__GAUSSIANOBSERVATION_HPP_
 
 
 #include "romea_core_filtering/GaussianDistribution.hpp"
 
 
-namespace romea {
+namespace romea
+{
 
 
-template<typename Scalar, size_t DIM >
+template<typename Scalar, size_t DIM>
 struct GaussianObservation : GaussianDistribution<Scalar, DIM>
 {
-  GaussianObservation():
-    GaussianDistribution<Scalar, DIM>()
+  GaussianObservation()
+  : GaussianDistribution<Scalar, DIM>()
   {
   }
 
@@ -48,12 +52,12 @@ struct GaussianObservation : GaussianDistribution<Scalar, DIM>
     return this->secondMoment;
   }
 
-  const Scalar & R(const size_t & i, const size_t &j)const
+  const Scalar & R(const size_t & i, const size_t & j)const
   {
     return this->secondMoment(i, j);
   }
 
-  Scalar & R(const size_t & i, const size_t &j)
+  Scalar & R(const size_t & i, const size_t & j)
   {
     return this->secondMoment(i, j);
   }
@@ -61,4 +65,4 @@ struct GaussianObservation : GaussianDistribution<Scalar, DIM>
 
 }  // namespace romea
 
-#endif  // ROMEA_CORE_FILTERING_GAUSSIANOBSERVATION_HPP_
+#endif  // ROMEA_CORE_FILTERING__GAUSSIANOBSERVATION_HPP_

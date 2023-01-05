@@ -1,5 +1,8 @@
-#ifndef ROMEA_CORE_FILTERING_KALMAN_UNSCENTED_TRANSFORM_UNSCENTEDTRANSFORMINVERSE_HPP_
-#define ROMEA_CORE_FILTERING_KALMAN_UNSCENTED_TRANSFORM_UNSCENTEDTRANSFORMINVERSE_HPP_
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
+#ifndef ROMEA_CORE_FILTERING__KALMAN__UNSCENTED_TRANSFORM__UNSCENTEDTRANSFORMINVERSE_HPP_
+#define ROMEA_CORE_FILTERING__KALMAN__UNSCENTED_TRANSFORM__UNSCENTEDTRANSFORMINVERSE_HPP_
 
 // std
 #include <vector>
@@ -8,7 +11,8 @@
 #include "romea_core_filtering/GaussianDistribution.hpp"
 #include "romea_core_filtering/kalman/unscented_transform/UnscentedTransformParameters.hpp"
 
-namespace romea {
+namespace romea
+{
 
 template<typename Scalar, size_t DIM>
 struct UnscentedTransformInverse
@@ -26,13 +30,15 @@ struct UnscentedTransformInverse
     auto & secondMoment = gaussianDistribution.secondMoment;
 
     firstMoment.setConstant(0);
-    for (size_t n = 0; n < sigmaPoints.size(); ++n)
-      firstMoment+= meanWeights[n]*sigmaPoints[n];
+    for (size_t n = 0; n < sigmaPoints.size(); ++n) {
+      firstMoment += meanWeights[n] * sigmaPoints[n];
+    }
 
     secondMoment.setConstant(0);
-    for (size_t n = 0; n < sigmaPoints.size(); ++n)
-      secondMoment+= covarianceWeights[n]*(sigmaPoints[n]-firstMoment)
-          *(sigmaPoints[n]-firstMoment).transpose();
+    for (size_t n = 0; n < sigmaPoints.size(); ++n) {
+      secondMoment += covarianceWeights[n] * (sigmaPoints[n] - firstMoment) *
+        (sigmaPoints[n] - firstMoment).transpose();
+    }
   }
 };
 
@@ -52,16 +58,17 @@ struct UnscentedTransformInverse<Scalar, 1>
     auto & secondMoment = gaussianDistribution.secondMoment;
 
     firstMoment = 0;
-    for (size_t n = 0;n < sigmaPoints.size(); ++n)
-      firstMoment+= meanWeights[n]*sigmaPoints[n];
+    for (size_t n = 0; n < sigmaPoints.size(); ++n) {
+      firstMoment += meanWeights[n] * sigmaPoints[n];
+    }
 
     secondMoment = 0;
-    for (size_t n = 0;n < sigmaPoints.size(); ++n)
-      secondMoment += covarianceWeights[n]*std::pow(sigmaPoints[n]-firstMoment, 2);
+    for (size_t n = 0; n < sigmaPoints.size(); ++n) {
+      secondMoment += covarianceWeights[n] * std::pow(sigmaPoints[n] - firstMoment, 2);
+    }
   }
 };
 
 }  // namespace romea
 
-#endif  // ROMEA_CORE_FILTERING_KALMAN_UNSCENTED_TRANSFORM_UNSCENTEDTRANSFORMINVERSE_HPP_
-
+#endif  // ROMEA_CORE_FILTERING__KALMAN__UNSCENTED_TRANSFORM__UNSCENTEDTRANSFORMINVERSE_HPP_

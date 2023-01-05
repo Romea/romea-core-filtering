@@ -1,5 +1,8 @@
-#ifndef ROMEA_CORE_FILTERING_PARTICLE_PARTICLEFILTERUPDATERCORE_HPP_
-#define ROMEA_CORE_FILTERING_PARTICLE_PARTICLEFILTERUPDATERCORE_HPP_
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
+#ifndef ROMEA_CORE_FILTERING__PARTICLE__PARTICLEFILTERUPDATERCORE_HPP_
+#define ROMEA_CORE_FILTERING__PARTICLE__PARTICLEFILTERUPDATERCORE_HPP_
 
 // eigen
 #include <Eigen/Core>
@@ -9,36 +12,34 @@
 #include "romea_core_filtering/particle/ParticleFilterResampling.hpp"
 
 
-namespace romea {
+namespace romea
+{
 
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 class PFUpdaterCore
 {
-public :
-
+public:
   using RowMajorVector = Eigen::Array<Scalar, 1, Eigen::Dynamic>;
 
-public :
-
+public:
   explicit PFUpdaterCore(const std::size_t & numberOfParticles);
 
   virtual ~PFUpdaterCore() = default;
 
-protected :
-
+protected:
   size_t numberOfParticles_;
   ParticleFilterResampling<Scalar, StateDIM> resampling_;
 };
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-PFUpdaterCore<Scalar, StateDIM, ObservationDIM>::
-PFUpdaterCore(const std::size_t &numberOfParticles):
-  numberOfParticles_(numberOfParticles),
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
+PFUpdaterCore<Scalar, StateDIM,
+  ObservationDIM>::PFUpdaterCore(const std::size_t & numberOfParticles)
+: numberOfParticles_(numberOfParticles),
   resampling_(numberOfParticles)
 {
 }
 
 }  // namespace romea
 
-#endif  // ROMEA_CORE_FILTERING_PARTICLE_PARTICLEFILTERUPDATERCORE_HPP_
+#endif  // ROMEA_CORE_FILTERING__PARTICLE__PARTICLEFILTERUPDATERCORE_HPP_

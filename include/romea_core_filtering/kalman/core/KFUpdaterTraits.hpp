@@ -1,26 +1,30 @@
-#ifndef ROMEA_CORE_FILTERING_KALMAN_CORE_KFUPDATERTRAITS_HPP_
-#define ROMEA_CORE_FILTERING_KALMAN_CORE_KFUPDATERTRAITS_HPP_
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
+#ifndef ROMEA_CORE_FILTERING__KALMAN__CORE__KFUPDATERTRAITS_HPP_
+#define ROMEA_CORE_FILTERING__KALMAN__CORE__KFUPDATERTRAITS_HPP_
 
 #include <Eigen/Core>
 #include <type_traits>
 
-namespace romea{
+namespace romea
+{
 
 
 template<typename T, typename Enable = void>
 struct Zero
 {
-  static T zero(){return 0;}
+  static T zero() {return 0;}
 };
 
 template<typename T>
-struct Zero<T, typename std::enable_if< std::is_base_of< Eigen::MatrixBase<T>, T>::value>::type >
+struct Zero<T, typename std::enable_if<std::is_base_of<Eigen::MatrixBase<T>, T>::value>::type>
 {
-  static  T zero(){return T::Zero();}
+  static T zero() {return T::Zero();}
 };
 
 
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 struct KFUpdaterTraits
 {
   using X = Eigen::Matrix<Scalar, StateDIM, 1>;
@@ -31,7 +35,7 @@ struct KFUpdaterTraits
   using QInn = Eigen::Matrix<Scalar, ObservationDIM, ObservationDIM>;
 };
 
-template <typename Scalar, size_t StateDIM>
+template<typename Scalar, size_t StateDIM>
 struct KFUpdaterTraits<Scalar, StateDIM, 1>
 {
   using X = Eigen::Matrix<Scalar, StateDIM, 1>;
@@ -42,7 +46,7 @@ struct KFUpdaterTraits<Scalar, StateDIM, 1>
   using QInn = Scalar;
 };
 
-template <typename Scalar>
+template<typename Scalar>
 struct KFUpdaterTraits<Scalar, 1, 1>
 {
   using X = Scalar;
@@ -55,4 +59,4 @@ struct KFUpdaterTraits<Scalar, 1, 1>
 
 }  // namespace romea
 
-#endif  // ROMEA_CORE_FILTERING_KALMAN_CORE_KFUPDATERTRAITS_HPP_
+#endif  // ROMEA_CORE_FILTERING__KALMAN__CORE__KFUPDATERTRAITS_HPP_

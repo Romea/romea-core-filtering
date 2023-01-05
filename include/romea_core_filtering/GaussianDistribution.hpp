@@ -1,5 +1,8 @@
-#ifndef ROMEA_CORE_FILTERING_GAUSSIANDISTRIBUTION_HPP_
-#define ROMEA_CORE_FILTERING_GAUSSIANDISTRIBUTION_HPP_
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
+#ifndef ROMEA_CORE_FILTERING__GAUSSIANDISTRIBUTION_HPP_
+#define ROMEA_CORE_FILTERING__GAUSSIANDISTRIBUTION_HPP_
 
 // Eigen
 #include <Eigen/Core>
@@ -7,17 +10,18 @@
 // std
 #include <vector>
 
-namespace romea {
+namespace romea
+{
 
-template<typename Scalar, size_t DIM >
+template<typename Scalar, size_t DIM>
 struct GaussianDistribution
 {
   using FirstMoment = Eigen::Matrix<Scalar, DIM, 1>;
   using SecondMoment = Eigen::Matrix<Scalar, DIM, DIM>;
   using SigmaPoints = std::vector<FirstMoment, Eigen::aligned_allocator<FirstMoment>>;
 
-  GaussianDistribution():
-    firstMoment(FirstMoment::Constant(NAN)),
+  GaussianDistribution()
+  : firstMoment(FirstMoment::Constant(NAN)),
     secondMoment(SecondMoment::Zero())
   {
   }
@@ -39,8 +43,8 @@ struct GaussianDistribution<Scalar, 1>
   using SigmaPoints = std::vector<Scalar>;
 
 
-  GaussianDistribution():
-    firstMoment(NAN),
+  GaussianDistribution()
+  : firstMoment(NAN),
     secondMoment(0)
   {
   }
@@ -94,9 +98,6 @@ struct GaussianDistribution<Scalar, 1>
 //}
 
 
-
-
-
 }  // namespace romea
 
-#endif  // ROMEA_CORE_FILTERING_GAUSSIANDISTRIBUTION_HPP_
+#endif  // ROMEA_CORE_FILTERING__GAUSSIANDISTRIBUTION_HPP_

@@ -1,17 +1,21 @@
-#ifndef ROMEA_CORE_FILTERING_GAUSSIANINPUT_HPP_
-#define ROMEA_CORE_FILTERING_GAUSSIANINPUT_HPP_
+// Copyright 2022 INRAE, French National Research Institute for Agriculture, Food and Environment
+// Add license
+
+#ifndef ROMEA_CORE_FILTERING__GAUSSIANINPUT_HPP_
+#define ROMEA_CORE_FILTERING__GAUSSIANINPUT_HPP_
 
 
 #include "romea_core_filtering/GaussianDistribution.hpp"
 
-namespace romea {
+namespace romea
+{
 
 
-template<typename Scalar, size_t DIM >
+template<typename Scalar, size_t DIM>
 struct GaussianInput : GaussianDistribution<Scalar, DIM>
 {
-  GaussianInput():
-    GaussianDistribution<Scalar, DIM>()
+  GaussianInput()
+  : GaussianDistribution<Scalar, DIM>()
   {
   }
 
@@ -47,12 +51,12 @@ struct GaussianInput : GaussianDistribution<Scalar, DIM>
     return this->secondMoment;
   }
 
-  const Scalar & QU(const size_t & i, const size_t &j)const
+  const Scalar & QU(const size_t & i, const size_t & j)const
   {
     return this->secondMoment(i, j);
   }
 
-  Scalar & QU(const size_t & i, const size_t &j)
+  Scalar & QU(const size_t & i, const size_t & j)
   {
     return this->secondMoment(i, j);
   }
@@ -66,4 +70,4 @@ struct GaussianInput : GaussianDistribution<Scalar, DIM>
 
 }  // namespace romea
 
-#endif  // ROMEA_CORE_FILTERING_GAUSSIANINPUT_HPP_
+#endif  // ROMEA_CORE_FILTERING__GAUSSIANINPUT_HPP_
