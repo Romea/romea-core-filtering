@@ -21,6 +21,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<class State, class FSMState, class Duration>
 class FilterPredictor
@@ -39,6 +41,7 @@ public:
     State & currentState) = 0;
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__FILTERPREDICTOR_HPP_

@@ -31,6 +31,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 enum class ParticleFilterResamplingScheme
 {
@@ -238,6 +240,7 @@ void ParticleFilterResampling<Scalar, DIM>::resampling_(ParticleFilterState<Scal
   state.weights.setConstant(1. / numberOfParticles_);
 }
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__PARTICLE__PARTICLEFILTERRESAMPLING_HPP_

@@ -26,6 +26,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 class PFUpdaterCore
@@ -52,6 +54,7 @@ PFUpdaterCore<Scalar, StateDIM,
 {
 }
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__PARTICLE__PARTICLEFILTERUPDATERCORE_HPP_

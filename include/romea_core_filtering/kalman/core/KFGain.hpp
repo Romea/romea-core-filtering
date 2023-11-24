@@ -21,6 +21,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 //-----------------------------------------------------------------------------
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
@@ -51,6 +53,7 @@ struct KFGain<Scalar, 1, 1>
   }
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING_KALMAN_CORE_KFGAIN_HPP_

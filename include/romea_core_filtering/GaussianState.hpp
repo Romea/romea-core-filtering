@@ -20,6 +20,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<typename Scalar, size_t DIM>
 struct GaussianState : GaussianDistribution<Scalar, DIM>
@@ -79,6 +81,7 @@ struct GaussianState : GaussianDistribution<Scalar, DIM>
   }
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__GAUSSIANSTATE_HPP_

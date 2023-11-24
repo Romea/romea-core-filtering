@@ -25,6 +25,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<typename Scalar, size_t DIM>
 struct UnscentedTransformInverse
@@ -81,6 +83,7 @@ struct UnscentedTransformInverse<Scalar, 1>
   }
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN__UNSCENTED_TRANSFORM__UNSCENTEDTRANSFORMINVERSE_HPP_

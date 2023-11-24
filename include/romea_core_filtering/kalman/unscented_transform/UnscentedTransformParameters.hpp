@@ -25,6 +25,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 
 template<typename Scalar>
@@ -55,6 +57,7 @@ struct UnscentedTransformParameters
   std::vector<Scalar> covarianceWeights;
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN__UNSCENTED_TRANSFORM__UNSCENTEDTRANSFORMPARAMETERS_HPP

@@ -28,6 +28,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 
 template<typename Scalar, size_t DIM>
@@ -58,6 +60,7 @@ struct UnscentedTransformFoward
   }
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN_UNSCENTED__TRANSFORM__UNSCENTEDTRANSFORMFORWARD_HPP_

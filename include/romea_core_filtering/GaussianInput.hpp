@@ -21,6 +21,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 
 template<typename Scalar, size_t DIM>
@@ -80,6 +82,7 @@ struct GaussianInput : GaussianDistribution<Scalar, DIM>
   }
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__GAUSSIANINPUT_HPP_

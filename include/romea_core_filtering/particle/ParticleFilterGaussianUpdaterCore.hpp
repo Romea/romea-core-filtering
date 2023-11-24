@@ -26,6 +26,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 class PFGaussianUpdaterCore : public PFUpdaterCore<Scalar, StateDIM, ObservationDIM>
@@ -215,6 +217,7 @@ bool PFGaussianUpdaterCore<Scalar, StateDIM, 1>::updateState_(
   }
 }
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__PARTICLE__PARTICLEFILTERGAUSSIANUPDATERCORE_HPP_

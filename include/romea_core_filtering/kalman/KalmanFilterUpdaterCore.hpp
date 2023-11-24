@@ -28,6 +28,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 class KFUpdaterCore
@@ -75,6 +77,7 @@ protected:
   Scalar maximalMahalanobisDistance_;
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN__KALMANFILTERUPDATERCORE_HPP_

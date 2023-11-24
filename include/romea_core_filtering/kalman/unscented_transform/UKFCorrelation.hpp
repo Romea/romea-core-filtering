@@ -22,6 +22,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 struct UKFCorrelation
@@ -108,6 +110,7 @@ struct UKFCorrelation<Scalar, 1, 1>
   }
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN__UNSCENTED__TRANSFORM__UKFCORRELATION_HPP_

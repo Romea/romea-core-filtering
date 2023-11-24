@@ -60,7 +60,7 @@ enum class TimeFSMState
 };
 
 //-----------------------------------------------------------------------------
-class TimePredictor : public romea::FilterPredictor<TimeState, TimeFSMState, Duration>
+class TimePredictor : public romea::core::FilterPredictor<TimeState, TimeFSMState, Duration>
 {
 public:
   TimePredictor() {}
@@ -119,11 +119,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class TimerFilter : public romea::Filter<TimeState, TimeFSMState, Duration>
+class TimerFilter : public romea::core::Filter<TimeState, TimeFSMState, Duration>
 {
 public:
   explicit TimerFilter(const size_t & statePoolSize)
-  : romea::Filter<TimeState, TimeFSMState, Duration>(statePoolSize)
+  : romea::core::Filter<TimeState, TimeFSMState, Duration>(statePoolSize)
   {
     predictor_ = std::make_unique<TimePredictor>();
     for (size_t n = 0; n < statePoolSize; ++n) {

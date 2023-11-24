@@ -19,6 +19,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 enum FilterType
 {
@@ -26,6 +28,7 @@ enum FilterType
   PARTICLE
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__FILTERTYPE_HPP_

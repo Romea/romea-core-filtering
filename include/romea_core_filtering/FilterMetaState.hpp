@@ -27,6 +27,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<class State, class FSMState, class Duration>
 struct FilterMetaState
@@ -61,6 +63,7 @@ public:
   UpdateFunction update;
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // INCLUDE_ROMEA_CORE__FILTERING__FILTERMETASTATE_HPP_

@@ -21,6 +21,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<typename Scalar, size_t DIM>
 struct ParticleFilterState
@@ -57,6 +59,7 @@ void ParticleFilterState<Scalar, DIM>::reset()
   weights.setConstant(1. / weights.cols());
 }
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__PARTICLE__PARTICLEFILTERSTATE_HPP_

@@ -27,7 +27,7 @@ TEST(testUKF, testUnscentedTransform)
   using StateSigmaPoints = std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>;
   using ObservationSigmaPoints = std::vector<double>;
 
-  romea::GaussianState<double, 3> state;
+  romea::core::GaussianState<double, 3> state;
   state.X() << 10.0401196, -6.541962718, 5.773763097;
   state.P().row(0) << 0.003713927914, 0.004473035868, 0.003144414499;
   state.P().row(1) << 0.004473035868, 0.009133254681, 0.005490835273;
@@ -37,13 +37,13 @@ TEST(testUKF, testUnscentedTransform)
   const double UNSCENTED_TRANSFORM_ALPHA = 0.75;
   const double UNSCENTED_TRANSFORM_BETA = 2;
 
-  romea::UnscentedTransformParameters<double> params(3,
+  romea::core::UnscentedTransformParameters<double> params(3,
     UNSCENTED_TRANSFORM_KAPPA,
     UNSCENTED_TRANSFORM_ALPHA,
     UNSCENTED_TRANSFORM_BETA);
 
   StateSigmaPoints stateSigmaPoints(7);
-  romea::UnscentedTransformFoward<double, 3>::toSigmaPoints(params, state, stateSigmaPoints);
+  romea::core::UnscentedTransformFoward<double, 3>::toSigmaPoints(params, state, stateSigmaPoints);
 
   EXPECT_NEAR(stateSigmaPoints[0][0], 10.04011967, 0.01);
   EXPECT_NEAR(stateSigmaPoints[0][1], -6.541962718, 0.01);
@@ -76,15 +76,15 @@ TEST(testUKF, testUnscentedTransform)
   propagatedSigmaPoints[5] = 11.05318411;
   propagatedSigmaPoints[6] = 11.05509837;
 
-  romea::GaussianObservation<double, 1> propagatedState;
-  romea::UnscentedTransformInverse<double, 1>::
+  romea::core::GaussianObservation<double, 1> propagatedState;
+  romea::core::UnscentedTransformInverse<double, 1>::
   toGaussian(params, propagatedSigmaPoints, propagatedState);
 
   EXPECT_NEAR(propagatedState.Y(), 11.07642123, 0.01);
   EXPECT_NEAR(propagatedState.R(), 0.002285136065, 0.01);
 
   Eigen::Matrix<double, 3, 1> propagationCorrelation(3, 1);
-  romea::UKFCorrelation<double, 3, 1>::compute(
+  romea::core::UKFCorrelation<double, 3, 1>::compute(
     params,
     state,
     propagatedState,

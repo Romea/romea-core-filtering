@@ -30,6 +30,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<class State, class FSMState, class Duration>
 class ParticleFilter : public Filter<State, FSMState, Duration>
@@ -58,6 +60,7 @@ private:
   size_t numberOfParticles_;
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__PARTICLE__PARTICLEFILTER_HPP_

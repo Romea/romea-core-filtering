@@ -21,6 +21,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 
 template<typename T, typename Enable = void>
@@ -69,6 +71,7 @@ struct KFUpdaterTraits<Scalar, 1, 1>
   using QInn = Scalar;
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN__CORE__KFUPDATERTRAITS_HPP_

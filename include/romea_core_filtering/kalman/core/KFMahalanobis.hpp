@@ -27,6 +27,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 
 //-----------------------------------------------------------------------------
@@ -62,6 +64,7 @@ struct KFMahalanobis<Scalar, 1>
   }
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN__CORE__KFMAHALANOBIS_HPP_

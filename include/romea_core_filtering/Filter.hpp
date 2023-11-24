@@ -35,6 +35,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<class State, class FSMState, class Duration>
 class Filter
@@ -245,6 +247,7 @@ void Filter<State, FSMState, Duration>::process(
   }
 }
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // INCLUDE_ROMEA_CORE_FILTERING_FILTER_HPP_

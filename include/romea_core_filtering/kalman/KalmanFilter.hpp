@@ -25,6 +25,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<class State, class FSMState, class Duration>
 class KalmanFilter : public Filter<State, FSMState, Duration>
@@ -42,6 +44,7 @@ public:
   virtual ~KalmanFilter() = default;
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN__KALMANFILTER_HPP_

@@ -22,6 +22,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 
 //-----------------------------------------------------------------------------
@@ -64,6 +66,7 @@ struct KFUpdateStateCovariance<Scalar, 1, 1>
   }
 };
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN__CORE__KFUPDATE_HPP_

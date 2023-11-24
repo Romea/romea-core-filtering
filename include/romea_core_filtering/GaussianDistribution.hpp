@@ -24,6 +24,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 template<typename Scalar, size_t DIM>
 struct GaussianDistribution
@@ -110,6 +112,7 @@ struct GaussianDistribution<Scalar, 1>
 //}
 
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__GAUSSIANDISTRIBUTION_HPP_

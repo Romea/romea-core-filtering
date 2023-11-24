@@ -22,6 +22,8 @@
 
 namespace romea
 {
+namespace core
+{
 
 //-----------------------------------------------------------------------------
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
@@ -46,6 +48,7 @@ inline void computeInnovationCovariance(
 }
 
 
+}  // namespace core
 }  // namespace romea
 
 #endif  // ROMEA_CORE_FILTERING__KALMAN__CORE__KFINNOVATION_HPP_
