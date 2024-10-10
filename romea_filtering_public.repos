@@ -1,0 +1,4 @@
+repositories:
+  romea_core/romea_filtering:
+    type: git
+    url: https://github.com/Romea/romea-core-filtering.git
