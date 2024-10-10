@@ -35,11 +35,11 @@ Project Title is released under the Apache License 2.0. See the LICENSE file for
 
 The Romea Core Filtering library was written by **Jean Laneurit**, based on his thesis work under the supervision of **Roland Chapuis**. Several individuals contributed scientifically to this project:
 
-**Jean Laneurit**
-**Roland Chapuis**
-**Romuald Aufrere**
-**Cyrille Pierre**
-**Christophe Debain**
+**Jean Laneurit**  
+**Roland Chapuis**  
+**Romuald Aufrere**  
+**Cyrille Pierre**  
+**Christophe Debain**  
 
 ## **Contact**
 
