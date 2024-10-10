@@ -38,7 +38,6 @@ The Romea Core Filtering library was written by **Jean Laneurit**, based on his 
 **Jean Laneurit**  
 **Roland Chapuis**  
 **Romuald Aufrere**  
-**Cyrille Pierre**  
 **Christophe Debain**  
 
 ## **Contact**
