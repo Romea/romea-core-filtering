@@ -1,6 +1,6 @@
-# ROMEA Core Filtering Library
+# romea_core_filtering #
 
-This library is a **header-only library** that provides tools for setting up asynchronous data fusion using **Kalman filters** or **particle filters**. It is an integral part of the **ROMEA robotics ecosystem**, enabling enhanced sensor data integration and estimation capabilities.
+This project is a **header-only library** that provides tools for setting up asynchronous data fusion using **Kalman filters** or **particle filters**. It is an integral part of the **ROMEA robotics ecosystem**, enabling enhanced sensor data integration and estimation capabilities.
 
 ## **Usage**
 
@@ -33,7 +33,7 @@ This project is released under the Apache License 2.0. See the LICENSE file for 
 
 ## **Authors**
 
-The Romea Core Filtering library was written by **Jean Laneurit**, based on his thesis work under the supervision of **Roland Chapuis**. Several individuals contributed scientifically to this project:
+The romea_core_filtering library was written by **Jean Laneurit**, based on his thesis work under the supervision of **Roland Chapuis**. Several individuals contributed scientifically to this project:
 
 **Jean Laneurit**  
 **Roland Chapuis**  
@@ -42,4 +42,4 @@ The Romea Core Filtering library was written by **Jean Laneurit**, based on his 
 
 ## **Contact**
 
-If you have any questions or comments about Romea Core Filtering library, please contact **[Jean Laneurit](mailto:jean.laneurit@inrae.fr)** 
+If you have any questions or comments about romea_core_filtering library, please contact **[Jean Laneurit](mailto:jean.laneurit@inrae.fr)** 
