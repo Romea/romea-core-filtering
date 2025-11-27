@@ -3,4 +3,3 @@ repositories:
     type: git
     url: git@forge.inrae.fr:romea_core/romea_filtering.git
 
-
