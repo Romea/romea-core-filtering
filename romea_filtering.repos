@@ -1,4 +1,5 @@
 repositories:
   romea_core/romea_filtering:
     type: git
-    url: git@gitlab-ssh.irstea.fr:romea_core/romea_filtering.git
+    url: git@forge.inrae.fr:romea_core/romea_filtering.git
+
