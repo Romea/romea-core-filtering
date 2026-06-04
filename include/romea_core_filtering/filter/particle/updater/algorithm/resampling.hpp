@@ -29,40 +29,42 @@
 // romea
 #include "romea_core_filtering/filter/particle/state.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-enum class ParticleFilterResamplingScheme {
+enum class ParticleFilterResamplingScheme
+{
   MUTINOMIAL,
   STRATIFIED,
   SYSTEMATIC,
 };
 
-template <class Scalar, size_t DIM>
-class ParticleFilterResampling {
- public:
-  typedef Eigen::Array<Scalar, 1, Eigen::Dynamic, Eigen::RowMajor>
-      RowMajorVector;
-  typedef Eigen::Array<Scalar, DIM, Eigen::Dynamic, Eigen::RowMajor>
-      RowMajorMatrix;
+template<class Scalar, size_t DIM>
+class ParticleFilterResampling
+{
+public:
+  typedef Eigen::Array<Scalar, 1, Eigen::Dynamic, Eigen::RowMajor> RowMajorVector;
+  typedef Eigen::Array<Scalar, DIM, Eigen::Dynamic, Eigen::RowMajor> RowMajorMatrix;
 
- public:
-  ParticleFilterResampling(const size_t& number_of_particles,
-                           const long long& rng_seed = std::random_device()());
+public:
+  ParticleFilterResampling(
+    const size_t & number_of_particles, const long long & rng_seed = std::random_device()());
 
-  void resampling(ParticleFilterState<Scalar, DIM>& state,
-                  const ParticleFilterResamplingScheme& resampling_type,
-                  const Scalar& number_of_effective_sample_threshold = 1.);
+  void resampling(
+    ParticleFilterState<Scalar, DIM> & state,
+    const ParticleFilterResamplingScheme & resampling_type,
+    const Scalar & number_of_effective_sample_threshold = 1.);
 
-  void set_number_of_effective_sample_threshold(const Scalar& threshold);
+  void set_number_of_effective_sample_threshold(const Scalar & threshold);
 
- protected:
-  void normalize_state_weights_(RowMajorVector& weights);
+protected:
+  void normalize_state_weights_(RowMajorVector & weights);
 
-  void compute_state_sum_sum_weights_(const RowMajorVector& weights);
+  void compute_state_sum_sum_weights_(const RowMajorVector & weights);
 
-  void compute_random_cum_sum_weights_(
-      const ParticleFilterResamplingScheme& resampling_scheme);
+  void compute_random_cum_sum_weights_(const ParticleFilterResamplingScheme & resampling_scheme);
 
   void compute_multinomial_random_cum_sum_weights_();
 
@@ -70,9 +72,9 @@ class ParticleFilterResampling {
 
   void compute_systematic_random_cum_sum_weights_();
 
-  void resampling_(ParticleFilterState<Scalar, DIM>& state);
+  void resampling_(ParticleFilterState<Scalar, DIM> & state);
 
- protected:
+protected:
   size_t number_of_particles_;
   RowMajorVector state_cum_sum_weights_;
   RowMajorVector random_cum_sum_weights_;
@@ -83,29 +85,30 @@ class ParticleFilterResampling {
 };
 
 //-----------------------------------------------------------------------------
-template <class Scalar, size_t DIM>
+template<class Scalar, size_t DIM>
 ParticleFilterResampling<Scalar, DIM>::ParticleFilterResampling(
-    const size_t& number_of_particles, const long long& rng_seed)
-    : number_of_particles_(number_of_particles),
-      state_cum_sum_weights_(RowMajorVector::Zero(number_of_particles)),
-      random_cum_sum_weights_(RowMajorVector::Zero(number_of_particles)),
-      resampled_particles_(RowMajorMatrix::Zero(DIM, number_of_particles)),
-      rng_(rng_seed),
-      uniform_distribution(0, 1) {}
+  const size_t & number_of_particles, const long long & rng_seed)
+: number_of_particles_(number_of_particles),
+  state_cum_sum_weights_(RowMajorVector::Zero(number_of_particles)),
+  random_cum_sum_weights_(RowMajorVector::Zero(number_of_particles)),
+  resampled_particles_(RowMajorMatrix::Zero(DIM, number_of_particles)),
+  rng_(rng_seed),
+  uniform_distribution(0, 1)
+{
+}
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t DIM>
+template<typename Scalar, size_t DIM>
 void ParticleFilterResampling<Scalar, DIM>::resampling(
-    ParticleFilterState<Scalar, DIM>& state,
-    const ParticleFilterResamplingScheme& resampling_scheme,
-    const Scalar& number_of_effective_sample_threshold) {
+  ParticleFilterState<Scalar, DIM> & state,
+  const ParticleFilterResamplingScheme & resampling_scheme,
+  const Scalar & number_of_effective_sample_threshold)
+{
   assert(size_t(state.particles.cols()) == number_of_particles_);
 
   normalize_state_weights_(state.weights);
-  double number_of_effective_samples =
-      1. / (state.weights.array().square().sum());
-  if (number_of_effective_samples <
-      number_of_particles_ * number_of_effective_sample_threshold) {
+  double number_of_effective_samples = 1. / (state.weights.array().square().sum());
+  if (number_of_effective_samples < number_of_particles_ * number_of_effective_sample_threshold) {
     compute_state_sum_sum_weights_(state.weights);
     compute_random_cum_sum_weights_(resampling_scheme);
     resampling_(state);
@@ -113,9 +116,9 @@ void ParticleFilterResampling<Scalar, DIM>::resampling(
 }
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t DIM>
-void ParticleFilterResampling<Scalar, DIM>::normalize_state_weights_(
-    RowMajorVector& weights) {
+template<typename Scalar, size_t DIM>
+void ParticleFilterResampling<Scalar, DIM>::normalize_state_weights_(RowMajorVector & weights)
+{
   // Check if degenerescence
   double weights_sum = weights.array().sum();
   if (weights_sum < std::numeric_limits<Scalar>::epsilon()) {
@@ -126,29 +129,29 @@ void ParticleFilterResampling<Scalar, DIM>::normalize_state_weights_(
 }
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t DIM>
+template<typename Scalar, size_t DIM>
 void ParticleFilterResampling<Scalar, DIM>::compute_state_sum_sum_weights_(
-    const RowMajorVector& weights) {
-  std::partial_sum(weights.data(), weights.data() + number_of_particles_,
-                   state_cum_sum_weights_.data());
+  const RowMajorVector & weights)
+{
+  std::partial_sum(
+    weights.data(), weights.data() + number_of_particles_, state_cum_sum_weights_.data());
 
   state_cum_sum_weights_ /= state_cum_sum_weights_(number_of_particles_ - 1);
 }
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t DIM>
-void ParticleFilterResampling<
-    Scalar, DIM>::compute_statified_random_cum_sum_weights_() {
+template<typename Scalar, size_t DIM>
+void ParticleFilterResampling<Scalar, DIM>::compute_statified_random_cum_sum_weights_()
+{
   for (size_t n = 0; n < number_of_particles_; ++n) {
-    random_cum_sum_weights_(n) =
-        (n + uniform_distribution(rng_)) / number_of_particles_;
+    random_cum_sum_weights_(n) = (n + uniform_distribution(rng_)) / number_of_particles_;
   }
 }
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t DIM>
-void ParticleFilterResampling<
-    Scalar, DIM>::compute_multinomial_random_cum_sum_weights_() {
+template<typename Scalar, size_t DIM>
+void ParticleFilterResampling<Scalar, DIM>::compute_multinomial_random_cum_sum_weights_()
+{
   Scalar cum_sum_weight = 0;
   for (size_t n = 0; n < number_of_particles_; ++n) {
     cum_sum_weight -= std::log2(uniform_distribution(rng_));
@@ -158,9 +161,9 @@ void ParticleFilterResampling<
 }
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t DIM>
-void ParticleFilterResampling<
-    Scalar, DIM>::compute_systematic_random_cum_sum_weights_() {
+template<typename Scalar, size_t DIM>
+void ParticleFilterResampling<Scalar, DIM>::compute_systematic_random_cum_sum_weights_()
+{
   Scalar us = uniform_distribution(rng_);
   for (size_t n = 0; n < number_of_particles_; ++n) {
     random_cum_sum_weights_(n) = (n + us) / number_of_particles_;
@@ -168,9 +171,10 @@ void ParticleFilterResampling<
 }
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t DIM>
+template<typename Scalar, size_t DIM>
 void ParticleFilterResampling<Scalar, DIM>::compute_random_cum_sum_weights_(
-    const ParticleFilterResamplingScheme& resampling_scheme) {
+  const ParticleFilterResamplingScheme & resampling_scheme)
+{
   //  //draw random weights
   //  random_cum_sum_weights_.setRandom();
   //  random_cum_sum_weights_.array()+=1;
@@ -198,12 +202,12 @@ void ParticleFilterResampling<Scalar, DIM>::compute_random_cum_sum_weights_(
 }
 
 //-----------------------------------------------------------------------------
-template <class Scalar, size_t DIM>
-void ParticleFilterResampling<Scalar, DIM>::resampling_(
-    ParticleFilterState<Scalar, DIM>& state) {
+template<class Scalar, size_t DIM>
+void ParticleFilterResampling<Scalar, DIM>::resampling_(ParticleFilterState<Scalar, DIM> & state)
+{
   std::cout << " resampling" << std::endl;
-  std::cout << state_cum_sum_weights_(0) << " "
-            << state_cum_sum_weights_(number_of_particles_ - 1) << std::endl;
+  std::cout << state_cum_sum_weights_(0) << " " << state_cum_sum_weights_(number_of_particles_ - 1)
+            << std::endl;
   std::cout << random_cum_sum_weights_(0) << " "
             << random_cum_sum_weights_(number_of_particles_ - 1) << std::endl;
 

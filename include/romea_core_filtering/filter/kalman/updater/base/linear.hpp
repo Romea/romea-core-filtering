@@ -26,51 +26,48 @@
 #include "romea_core_filtering/filter/kalman/updater/equation/update.hpp"
 #include "romea_core_filtering/gaussian/state.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-class LKFUpdaterBase {
- public:
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
+class LKFUpdaterBase
+{
+public:
   using State = GaussianState<Scalar, StateDIM>;
 
- public:
-  explicit LKFUpdaterBase(const Scalar& maximal_mahalanobis_distance)
-      : Inn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM,
-                                           ObservationDIM>::Inn>::zero()),
-        QInn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM,
-                                            ObservationDIM>::QInn>::zero()),
-        QInnInverse_(
-            Zero<typename KFUpdaterTraits<Scalar, StateDIM,
-                                          ObservationDIM>::QInn>::zero()),
-        H_(Zero<typename KFUpdaterTraits<Scalar, StateDIM,
-                                         ObservationDIM>::H>::zero()),
-        K_(Zero<typename KFUpdaterTraits<Scalar, StateDIM,
-                                         ObservationDIM>::K>::zero()),
-        mahalanobis_distance_(std::numeric_limits<Scalar>::max()),
-        maximal_mahalanobis_distance_(maximal_mahalanobis_distance) {}
+public:
+  explicit LKFUpdaterBase(const Scalar & maximal_mahalanobis_distance)
+  : Inn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn>::zero()),
+    QInn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn>::zero()),
+    QInnInverse_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn>::zero()),
+    H_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::H>::zero()),
+    K_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K>::zero()),
+    mahalanobis_distance_(std::numeric_limits<Scalar>::max()),
+    maximal_mahalanobis_distance_(maximal_mahalanobis_distance)
+  {
+  }
 
   virtual ~LKFUpdaterBase() = default;
 
- protected:
-  bool update_state_(State& state) {
-    mahalanobis_distance_ = KFMahalanobis<Scalar, ObservationDIM>::compute(
-        Inn_, QInn_, QInnInverse_);
+protected:
+  bool update_state_(State & state)
+  {
+    mahalanobis_distance_ =
+      KFMahalanobis<Scalar, ObservationDIM>::compute(Inn_, QInn_, QInnInverse_);
 
     if (mahalanobis_distance_ < maximal_mahalanobis_distance_) {
-      KFGain<Scalar, StateDIM, ObservationDIM>::compute(state.P(), H_,
-                                                        QInnInverse_, K_);
-      KFUpdateStateVector<Scalar, StateDIM, ObservationDIM>::compute(state.X(),
-                                                                     Inn_, K_);
-      KFUpdateStateCovariance<Scalar, StateDIM, ObservationDIM>::compute(
-          state.P(), QInn_, K_);
+      KFGain<Scalar, StateDIM, ObservationDIM>::compute(state.P(), H_, QInnInverse_, K_);
+      KFUpdateStateVector<Scalar, StateDIM, ObservationDIM>::compute(state.X(), Inn_, K_);
+      KFUpdateStateCovariance<Scalar, StateDIM, ObservationDIM>::compute(state.P(), QInn_, K_);
       return true;
     } else {
       return false;
     }
   }
 
- protected:
+protected:
   typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn Inn_;
   typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn QInn_;
   typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn QInnInverse_;

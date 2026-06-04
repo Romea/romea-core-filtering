@@ -23,7 +23,8 @@
 #include "romea_core_filtering/filter/kalman/updater/equation/mahalanobis.hpp"
 #include "romea_core_filtering/filter/kalman/updater/equation/update.hpp"
 
-TEST(TestKalmanEquations, computesScalarInnovationCovarianceGainAndUpdate) {
+TEST(TestKalmanEquations, computesScalarInnovationCovarianceGainAndUpdate)
+{
   double P = 4.;
   double H = 0.5;
   double R = 1.;
@@ -34,8 +35,7 @@ TEST(TestKalmanEquations, computesScalarInnovationCovarianceGainAndUpdate) {
   EXPECT_DOUBLE_EQ(QInn, 2.);
 
   double QInnInverse = 0.;
-  const double mahalanobis =
-      romea::core::KFMahalanobis<double, 1>::compute(2., QInn, QInnInverse);
+  const double mahalanobis = romea::core::KFMahalanobis<double, 1>::compute(2., QInn, QInnInverse);
 
   EXPECT_DOUBLE_EQ(QInnInverse, 0.5);
   EXPECT_DOUBLE_EQ(mahalanobis, std::sqrt(2.));
@@ -53,7 +53,8 @@ TEST(TestKalmanEquations, computesScalarInnovationCovarianceGainAndUpdate) {
   EXPECT_DOUBLE_EQ(P, 2.);
 }
 
-TEST(TestKalmanEquations, computesMatrixInnovationCovarianceGainAndUpdate) {
+TEST(TestKalmanEquations, computesMatrixInnovationCovarianceGainAndUpdate)
+{
   Eigen::Matrix2d P;
   P << 2., 0.5, 0.5, 1.;
 
@@ -74,13 +75,10 @@ TEST(TestKalmanEquations, computesMatrixInnovationCovarianceGainAndUpdate) {
   Inn << 1.5, -0.5;
 
   Eigen::Matrix2d expected_QInnInverse = expected_QInn.inverse();
-  const double mahalanobis =
-      romea::core::KFMahalanobis<double, 2>::compute(Inn, QInn, QInnInverse);
+  const double mahalanobis = romea::core::KFMahalanobis<double, 2>::compute(Inn, QInn, QInnInverse);
 
   EXPECT_TRUE(QInnInverse.isApprox(expected_QInnInverse, 1e-12));
-  EXPECT_NEAR(mahalanobis,
-              std::sqrt((Inn.transpose() * expected_QInnInverse * Inn)(0, 0)),
-              1e-12);
+  EXPECT_NEAR(mahalanobis, std::sqrt((Inn.transpose() * expected_QInnInverse * Inn)(0, 0)), 1e-12);
 
   Eigen::Matrix2d K;
   Eigen::Matrix2d expected_K = P * H.transpose() * expected_QInnInverse;
@@ -100,14 +98,14 @@ TEST(TestKalmanEquations, computesMatrixInnovationCovarianceGainAndUpdate) {
   EXPECT_TRUE(P.isApprox(expected_P, 1e-12));
 }
 
-TEST(TestKalmanEquations, throwsWhenInnovationCovarianceIsSingular) {
+TEST(TestKalmanEquations, throwsWhenInnovationCovarianceIsSingular)
+{
   Eigen::Matrix<double, 2, 1> Inn;
   Inn << 1., 2.;
 
   Eigen::Matrix2d QInn = Eigen::Matrix2d::Zero();
   Eigen::Matrix2d QInnInverse;
 
-  EXPECT_THROW((romea::core::KFMahalanobis<double, 2>::compute(
-                   Inn, QInn, QInnInverse)),
-               std::runtime_error);
+  EXPECT_THROW(
+    (romea::core::KFMahalanobis<double, 2>::compute(Inn, QInn, QInnInverse)), std::runtime_error);
 }

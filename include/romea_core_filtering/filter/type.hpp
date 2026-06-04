@@ -16,10 +16,16 @@
 #ifndef ROMEA_CORE_FILTERING__FILTER__TYPE_HPP_
 #define ROMEA_CORE_FILTERING__FILTER__TYPE_HPP_
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-enum FilterType { KALMAN, PARTICLE };
+enum FilterType
+{
+  KALMAN,
+  PARTICLE
+};
 
 }  // namespace core
 }  // namespace romea

@@ -20,87 +20,88 @@
 #include "romea_core_filtering/gaussian/state.hpp"
 #include "romea_core_filtering/unscented_transform/parameters.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-struct UKFCorrelation {
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
+struct UKFCorrelation
+{
   static void compute(
-      const UnscentedTransformParameters<Scalar>& parameters,
-      const GaussianState<Scalar, StateDIM>& state,
-      const GaussianObservation<Scalar, ObservationDIM>& propagatedState,
-      const typename GaussianState<Scalar, StateDIM>::SigmaPoints&
-          stateSigmaPoints,
-      const typename GaussianDistribution<Scalar, ObservationDIM>::SigmaPoints&
-          propagatedSigmaPoints,
-      Eigen::Matrix<Scalar, StateDIM, ObservationDIM>& correlationMatrix) {
+    const UnscentedTransformParameters<Scalar> & parameters,
+    const GaussianState<Scalar, StateDIM> & state,
+    const GaussianObservation<Scalar, ObservationDIM> & propagatedState,
+    const typename GaussianState<Scalar, StateDIM>::SigmaPoints & stateSigmaPoints,
+    const typename GaussianDistribution<Scalar, ObservationDIM>::SigmaPoints &
+      propagatedSigmaPoints,
+    Eigen::Matrix<Scalar, StateDIM, ObservationDIM> & correlationMatrix)
+  {
     assert(stateSigmaPoints.size() == 2 * StateDIM + 1);
     assert(propagatedSigmaPoints.size() == 2 * StateDIM + 1);
     assert(parameters.covariance_weights.size() == 2 * StateDIM + 1);
 
-    const auto& stateFirstMoment = state.first_moment;
-    const auto& propagatedFirstMoment = propagatedState.first_moment;
-    const auto& covariance_weights = parameters.covariance_weights;
+    const auto & stateFirstMoment = state.first_moment;
+    const auto & propagatedFirstMoment = propagatedState.first_moment;
+    const auto & covariance_weights = parameters.covariance_weights;
 
     correlationMatrix.setConstant(0);
     for (size_t n = 0; n < 2 * StateDIM + 1; ++n) {
-      correlationMatrix +=
-          covariance_weights[n] * (stateSigmaPoints[n] - stateFirstMoment) *
-          (propagatedSigmaPoints[n] - propagatedFirstMoment).transpose();
+      correlationMatrix += covariance_weights[n] * (stateSigmaPoints[n] - stateFirstMoment) *
+                           (propagatedSigmaPoints[n] - propagatedFirstMoment).transpose();
     }
   }
 };
 
-template <typename Scalar, size_t StateDIM>
-struct UKFCorrelation<Scalar, StateDIM, 1> {
+template<typename Scalar, size_t StateDIM>
+struct UKFCorrelation<Scalar, StateDIM, 1>
+{
   static void compute(
-      const UnscentedTransformParameters<Scalar>& parameters,
-      const GaussianState<Scalar, StateDIM>& state,
-      const GaussianObservation<Scalar, 1>& propagatedState,
-      const typename GaussianState<Scalar, StateDIM>::SigmaPoints&
-          stateSigmaPoints,
-      const typename GaussianObservation<Scalar, 1>::SigmaPoints&
-          propagatedSigmaPoints,
-      Eigen::Matrix<Scalar, StateDIM, 1>& correlationMatrix) {
+    const UnscentedTransformParameters<Scalar> & parameters,
+    const GaussianState<Scalar, StateDIM> & state,
+    const GaussianObservation<Scalar, 1> & propagatedState,
+    const typename GaussianState<Scalar, StateDIM>::SigmaPoints & stateSigmaPoints,
+    const typename GaussianObservation<Scalar, 1>::SigmaPoints & propagatedSigmaPoints,
+    Eigen::Matrix<Scalar, StateDIM, 1> & correlationMatrix)
+  {
     assert(stateSigmaPoints.size() == 2 * StateDIM + 1);
     assert(propagatedSigmaPoints.size() == 2 * StateDIM + 1);
     assert(parameters.covariance_weights.size() == 2 * StateDIM + 1);
 
-    const auto& stateFirstMoment = state.first_moment;
-    const auto& propagatedFirstMoment = propagatedState.first_moment;
-    const auto& covariance_weights = parameters.covariance_weights;
+    const auto & stateFirstMoment = state.first_moment;
+    const auto & propagatedFirstMoment = propagatedState.first_moment;
+    const auto & covariance_weights = parameters.covariance_weights;
 
     correlationMatrix.setConstant(0);
     for (size_t n = 0; n < 2 * StateDIM + 1; ++n) {
-      correlationMatrix += covariance_weights[n] *
-                           (stateSigmaPoints[n] - stateFirstMoment) *
+      correlationMatrix += covariance_weights[n] * (stateSigmaPoints[n] - stateFirstMoment) *
                            (propagatedSigmaPoints[n] - propagatedFirstMoment);
     }
   }
 };
 
-template <typename Scalar>
-struct UKFCorrelation<Scalar, 1, 1> {
+template<typename Scalar>
+struct UKFCorrelation<Scalar, 1, 1>
+{
   static void compute(
-      const UnscentedTransformParameters<Scalar>& parameters,
-      const GaussianState<Scalar, 1>& state,
-      const GaussianObservation<Scalar, 1>& propagatedState,
-      const typename GaussianState<Scalar, 1>::SigmaPoints& stateSigmaPoints,
-      const typename GaussianObservation<Scalar, 1>::SigmaPoints&
-          propagatedSigmaPoints,
-      double& correlationMatrix) {
+    const UnscentedTransformParameters<Scalar> & parameters,
+    const GaussianState<Scalar, 1> & state,
+    const GaussianObservation<Scalar, 1> & propagatedState,
+    const typename GaussianState<Scalar, 1>::SigmaPoints & stateSigmaPoints,
+    const typename GaussianObservation<Scalar, 1>::SigmaPoints & propagatedSigmaPoints,
+    double & correlationMatrix)
+  {
     assert(stateSigmaPoints.size() == 3);
     assert(propagatedSigmaPoints.size() == 3);
     assert(parameters.covariance_weights.size() == 3);
 
-    const auto& stateFirstMoment = state.first_moment;
-    const auto& propagatedFirstMoment = propagatedState.first_moment;
-    const auto& covariance_weights = parameters.covariance_weights;
+    const auto & stateFirstMoment = state.first_moment;
+    const auto & propagatedFirstMoment = propagatedState.first_moment;
+    const auto & covariance_weights = parameters.covariance_weights;
 
     correlationMatrix = 0;
     for (size_t n = 0; n < 3; ++n) {
-      correlationMatrix += covariance_weights[n] *
-                           (stateSigmaPoints[n] - stateFirstMoment) *
+      correlationMatrix += covariance_weights[n] * (stateSigmaPoints[n] - stateFirstMoment) *
                            (propagatedSigmaPoints[n] - propagatedFirstMoment);
     }
   }

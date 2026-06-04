@@ -23,14 +23,18 @@
 // romea
 #include "romea_core_filtering/filter/filter_base.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <class State, class FSMState, class Duration>
-class KalmanFilter : public FilterBase<State, FSMState, Duration> {
- public:
+template<class State, class FSMState, class Duration>
+class KalmanFilter : public FilterBase<State, FSMState, Duration>
+{
+public:
   explicit KalmanFilter(const size_t state_pool_size)
-      : FilterBase<State, FSMState, Duration>(state_pool_size) {
+  : FilterBase<State, FSMState, Duration>(state_pool_size)
+  {
     for (size_t n = 0; n < state_pool_size; ++n) {
       std::unique_ptr<State> state(new State());
       this->state_vector_pool_.push_back(std::move(state));

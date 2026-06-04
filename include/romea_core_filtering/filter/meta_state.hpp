@@ -24,28 +24,30 @@
 // romea
 // #include "romea_core_filtering/FilterUpdater.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <class State, class FSMState, class Duration>
-struct FilterMetaState {
- public:
-  using UpdateFunction =
-      std::function<void(const Duration&, FSMState&, State&)>;
+template<class State, class FSMState, class Duration>
+struct FilterMetaState
+{
+public:
+  using UpdateFunction = std::function<void(const Duration &, FSMState &, State &)>;
 
-  using PredictFunction =
-      std::function<void(const Duration&, const FSMState&, const State&,
-                         const Duration&, FSMState&, State&)>;
+  using PredictFunction = std::function<void(
+    const Duration &, const FSMState &, const State &, const Duration &, FSMState &, State &)>;
 
- public:
-  FilterMetaState(const Duration& duration, std::unique_ptr<State> state,
-                  UpdateFunction&& update)
-      :
+public:
+  FilterMetaState(const Duration & duration, std::unique_ptr<State> state, UpdateFunction && update)
+  :
 
-        duration(duration),
-        fsm_state(),
-        state(std::move(state)),
-        update(std::move(update)) {}
+    duration(duration),
+    fsm_state(),
+    state(std::move(state)),
+    update(std::move(update))
+  {
+  }
 
   Duration duration;
   FSMState fsm_state;

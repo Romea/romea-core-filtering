@@ -22,23 +22,26 @@
 // romea
 #include "romea_core_filtering/gaussian/distribution.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar>
-struct UnscentedTransformParameters {
-  UnscentedTransformParameters(const size_t& DIM, const double& kappa,
-                               const double& alpha, const double& beta)
-      : gamma(0), mean_weights(2 * DIM + 1), covariance_weights(2 * DIM + 1) {
+template<typename Scalar>
+struct UnscentedTransformParameters
+{
+  UnscentedTransformParameters(
+    const size_t & DIM, const double & kappa, const double & alpha, const double & beta)
+  : gamma(0), mean_weights(2 * DIM + 1), covariance_weights(2 * DIM + 1)
+  {
     double lambda = (alpha * alpha * (DIM + kappa) - DIM);
     gamma = std::sqrt(DIM + lambda);
 
     mean_weights[0] = lambda / (DIM + lambda);
     covariance_weights[0] = mean_weights[0] + 1 + alpha * alpha + beta;
-    std::fill(std::begin(mean_weights) + 1, std::end(mean_weights),
-              1 / (2 * (DIM + lambda)));
-    std::fill(std::begin(covariance_weights) + 1, std::end(covariance_weights),
-              1 / (2 * (DIM + lambda)));
+    std::fill(std::begin(mean_weights) + 1, std::end(mean_weights), 1 / (2 * (DIM + lambda)));
+    std::fill(
+      std::begin(covariance_weights) + 1, std::end(covariance_weights), 1 / (2 * (DIM + lambda)));
   }
 
   double gamma;

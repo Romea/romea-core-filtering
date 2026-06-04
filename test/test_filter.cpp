@@ -13,50 +13,57 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <gtest/gtest.h>
+
 #include <chrono>
 #include <memory>
 #include <utility>
 
-#include <gtest/gtest.h>
-
 #include "romea_core_filtering/filter/filter_base.hpp"
 #include "romea_core_filtering/filter/predictor_base.hpp"
 
-namespace {
+namespace
+{
 
 using Duration = std::chrono::duration<long long int, std::nano>;
 
-struct TimeState {
+struct TimeState
+{
   TimeState() : elapsed_time(Duration::zero()), update_count(0) {}
 
   Duration elapsed_time;
   size_t update_count;
 };
 
-enum class TimeFSMState { INIT = 0, RUN };
+enum class TimeFSMState
+{
+  INIT = 0,
+  RUN
+};
 
-class TimePredictor
-    : public romea::core::FilterPredictorBase<TimeState, TimeFSMState,
-                                              Duration> {
- public:
-  void predict(const Duration& previous_duration,
-               const TimeFSMState& previous_fsm_state,
-               const TimeState& previous_state,
-               const Duration& current_duration,
-               TimeFSMState& current_fsm_state,
-               TimeState& current_state) override {
+class TimePredictor : public romea::core::FilterPredictorBase<TimeState, TimeFSMState, Duration>
+{
+public:
+  void predict(
+    const Duration & previous_duration,
+    const TimeFSMState & previous_fsm_state,
+    const TimeState & previous_state,
+    const Duration & current_duration,
+    TimeFSMState & current_fsm_state,
+    TimeState & current_state) override
+  {
     current_state = previous_state;
     current_state.elapsed_time += current_duration - previous_duration;
     current_fsm_state = previous_fsm_state;
   }
 };
 
-class TimerFilter
-    : public romea::core::FilterBase<TimeState, TimeFSMState, Duration> {
- public:
-  explicit TimerFilter(const size_t& state_pool_size)
-      : romea::core::FilterBase<TimeState, TimeFSMState, Duration>(
-            state_pool_size) {
+class TimerFilter : public romea::core::FilterBase<TimeState, TimeFSMState, Duration>
+{
+public:
+  explicit TimerFilter(const size_t & state_pool_size)
+  : romea::core::FilterBase<TimeState, TimeFSMState, Duration>(state_pool_size)
+  {
     register_predictor(std::make_unique<TimePredictor>());
     for (size_t n = 0; n < state_pool_size; ++n) {
       state_vector_pool_.push_back(std::make_unique<TimeState>());
@@ -64,10 +71,9 @@ class TimerFilter
   }
 };
 
-romea::core::FilterMetaState<TimeState, TimeFSMState, Duration>::UpdateFunction
-make_time_update() {
-  return [](const Duration& duration, TimeFSMState& fsm_state,
-            TimeState& state) {
+romea::core::FilterMetaState<TimeState, TimeFSMState, Duration>::UpdateFunction make_time_update()
+{
+  return [](const Duration & duration, TimeFSMState & fsm_state, TimeState & state) {
     state.elapsed_time = duration;
     state.update_count += 1;
     fsm_state = TimeFSMState::RUN;
@@ -76,7 +82,8 @@ make_time_update() {
 
 }  // namespace
 
-TEST(TestFilter, processesLongSequenceWithPeriodicDelayedObservations) {
+TEST(TestFilter, processesLongSequenceWithPeriodicDelayedObservations)
+{
   TimerFilter filter(20);
 
   constexpr long long dt = 1000;

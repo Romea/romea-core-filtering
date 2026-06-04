@@ -18,44 +18,42 @@
 
 #include "romea_core_filtering/gaussian/distribution.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t DIM>
-struct GaussianInput : GaussianDistribution<Scalar, DIM> {
+template<typename Scalar, size_t DIM>
+struct GaussianInput : GaussianDistribution<Scalar, DIM>
+{
   GaussianInput() : GaussianDistribution<Scalar, DIM>() {}
 
   virtual ~GaussianInput() = default;
 
-  typename GaussianDistribution<Scalar, DIM>::FirstMoment& U() {
+  typename GaussianDistribution<Scalar, DIM>::FirstMoment & U() { return this->first_moment; }
+
+  const typename GaussianDistribution<Scalar, DIM>::FirstMoment & U() const
+  {
     return this->first_moment;
   }
 
-  const typename GaussianDistribution<Scalar, DIM>::FirstMoment& U() const {
-    return this->first_moment;
-  }
+  Scalar & U(const size_t & i) { return this->first_moment(i); }
 
-  Scalar& U(const size_t& i) { return this->first_moment(i); }
+  const Scalar & U(const size_t & i) const { return this->first_moment(i); }
 
-  const Scalar& U(const size_t& i) const { return this->first_moment(i); }
+  typename GaussianDistribution<Scalar, DIM>::SecondMoment & QU() { return this->second_moment; }
 
-  typename GaussianDistribution<Scalar, DIM>::SecondMoment& QU() {
+  const typename GaussianDistribution<Scalar, DIM>::SecondMoment & QU() const
+  {
     return this->second_moment;
   }
 
-  const typename GaussianDistribution<Scalar, DIM>::SecondMoment& QU() const {
-    return this->second_moment;
-  }
+  const Scalar & QU(const size_t & i, const size_t & j) const { return this->second_moment(i, j); }
 
-  const Scalar& QU(const size_t& i, const size_t& j) const {
-    return this->second_moment(i, j);
-  }
+  Scalar & QU(const size_t & i, const size_t & j) { return this->second_moment(i, j); }
 
-  Scalar& QU(const size_t& i, const size_t& j) {
-    return this->second_moment(i, j);
-  }
-
-  void reset() {
+  void reset()
+  {
     this->first_moment.setConstant(NAN);
     this->second_moment.setZero();
   }

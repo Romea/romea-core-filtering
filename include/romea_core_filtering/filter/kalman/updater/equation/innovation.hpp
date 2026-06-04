@@ -18,23 +18,27 @@
 
 #include "romea_core_filtering/gaussian/distribution.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 inline void compute_innovation_covariance(
-    const Eigen::Matrix<Scalar, StateDIM, StateDIM>& P,
-    const Eigen::Matrix<Scalar, StateDIM, ObservationDIM>& H,
-    const Eigen::Matrix<Scalar, ObservationDIM, ObservationDIM>& R,
-    Eigen::Matrix<Scalar, ObservationDIM, ObservationDIM>& QInn) {
+  const Eigen::Matrix<Scalar, StateDIM, StateDIM> & P,
+  const Eigen::Matrix<Scalar, StateDIM, ObservationDIM> & H,
+  const Eigen::Matrix<Scalar, ObservationDIM, ObservationDIM> & R,
+  Eigen::Matrix<Scalar, ObservationDIM, ObservationDIM> & QInn)
+{
   QInn = H * P * H.transpose() + R;
 }
 
 //-----------------------------------------------------------------------------
-template <typename Scalar>
-inline void compute_innovation_covariance(const double& P, const double& H,
-                                          const double& R, double& QInn) {
+template<typename Scalar>
+inline void compute_innovation_covariance(
+  const double & P, const double & H, const double & R, double & QInn)
+{
   QInn = H * P * H + R;
 }
 

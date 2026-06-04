@@ -13,15 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cmath>
-
 #include <gtest/gtest.h>
+
+#include <cmath>
 
 #include "romea_core_filtering/gaussian/input.hpp"
 #include "romea_core_filtering/gaussian/observation.hpp"
 #include "romea_core_filtering/gaussian/state.hpp"
 
-TEST(TestGaussianState, exposesStateVectorAndCovarianceAccessors) {
+TEST(TestGaussianState, exposesStateVectorAndCovarianceAccessors)
+{
   romea::core::GaussianState<double, 3> state;
 
   EXPECT_TRUE(std::isnan(state.X(0)));
@@ -47,7 +48,8 @@ TEST(TestGaussianState, exposesStateVectorAndCovarianceAccessors) {
   EXPECT_DOUBLE_EQ(state.P().sum(), 0.);
 }
 
-TEST(TestGaussianState, supportsScalarStateSpecialization) {
+TEST(TestGaussianState, supportsScalarStateSpecialization)
+{
   romea::core::GaussianState<double, 1> state;
 
   EXPECT_TRUE(std::isnan(state.X()));
@@ -65,7 +67,8 @@ TEST(TestGaussianState, supportsScalarStateSpecialization) {
   EXPECT_DOUBLE_EQ(state.P(), 0.);
 }
 
-TEST(TestGaussianInput, exposesInputVectorAndCovarianceAccessors) {
+TEST(TestGaussianInput, exposesInputVectorAndCovarianceAccessors)
+{
   romea::core::GaussianInput<double, 2> input;
 
   input.U() << 0.5, -0.25;
@@ -78,7 +81,8 @@ TEST(TestGaussianInput, exposesInputVectorAndCovarianceAccessors) {
   EXPECT_DOUBLE_EQ(input.QU(1, 1), 0.2);
 }
 
-TEST(TestGaussianObservation, exposesObservationVectorAndCovarianceAccessors) {
+TEST(TestGaussianObservation, exposesObservationVectorAndCovarianceAccessors)
+{
   romea::core::GaussianObservation<double, 2> observation;
 
   observation.Y() << 7., 8.;

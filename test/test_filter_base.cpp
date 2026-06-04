@@ -13,50 +13,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <gtest/gtest.h>
+
 #include <chrono>
 #include <memory>
 #include <utility>
 
-#include <gtest/gtest.h>
-
 #include "romea_core_filtering/filter/filter_base.hpp"
 #include "romea_core_filtering/filter/predictor_base.hpp"
 
-namespace {
+namespace
+{
 
 using Duration = std::chrono::duration<long long int, std::nano>;
 
-struct CounterState {
+struct CounterState
+{
   CounterState() : value(0), update_count(0) {}
 
   long long value;
   size_t update_count;
 };
 
-enum class CounterFSMState { INIT, RUN };
+enum class CounterFSMState
+{
+  INIT,
+  RUN
+};
 
 class CounterPredictor
-    : public romea::core::FilterPredictorBase<CounterState, CounterFSMState,
-                                              Duration> {
- public:
-  void predict(const Duration& previous_duration,
-               const CounterFSMState& previous_fsm_state,
-               const CounterState& previous_state,
-               const Duration& current_duration,
-               CounterFSMState& current_fsm_state,
-               CounterState& current_state) override {
+: public romea::core::FilterPredictorBase<CounterState, CounterFSMState, Duration>
+{
+public:
+  void predict(
+    const Duration & previous_duration,
+    const CounterFSMState & previous_fsm_state,
+    const CounterState & previous_state,
+    const Duration & current_duration,
+    CounterFSMState & current_fsm_state,
+    CounterState & current_state) override
+  {
     current_state = previous_state;
     current_state.value += (current_duration - previous_duration).count();
     current_fsm_state = previous_fsm_state;
   }
 };
 
-class CounterFilter
-    : public romea::core::FilterBase<CounterState, CounterFSMState, Duration> {
- public:
-  explicit CounterFilter(const size_t& state_pool_size)
-      : romea::core::FilterBase<CounterState, CounterFSMState, Duration>(
-            state_pool_size) {
+class CounterFilter : public romea::core::FilterBase<CounterState, CounterFSMState, Duration>
+{
+public:
+  explicit CounterFilter(const size_t & state_pool_size)
+  : romea::core::FilterBase<CounterState, CounterFSMState, Duration>(state_pool_size)
+  {
     register_predictor(std::make_unique<CounterPredictor>());
     for (size_t n = 0; n < state_pool_size; ++n) {
       auto state = std::make_unique<CounterState>();
@@ -65,11 +73,10 @@ class CounterFilter
   }
 };
 
-romea::core::FilterMetaState<CounterState, CounterFSMState,
-                             Duration>::UpdateFunction
-make_update_function(const long long value) {
-  return [value](const Duration& duration, CounterFSMState& fsm_state,
-                 CounterState& state) {
+romea::core::FilterMetaState<CounterState, CounterFSMState, Duration>::UpdateFunction
+make_update_function(const long long value)
+{
+  return [value](const Duration & duration, CounterFSMState & fsm_state, CounterState & state) {
     state.value = value + duration.count();
     state.update_count += 1;
     fsm_state = CounterFSMState::RUN;
@@ -78,7 +85,8 @@ make_update_function(const long long value) {
 
 }  // namespace
 
-TEST(TestFilterBase, returnsFalseWhenNoStateHasBeenInserted) {
+TEST(TestFilterBase, returnsFalseWhenNoStateHasBeenInserted)
+{
   CounterFilter filter(4);
   CounterState current_state;
 
@@ -86,7 +94,8 @@ TEST(TestFilterBase, returnsFalseWhenNoStateHasBeenInserted) {
   EXPECT_EQ(filter.get_fsm_state(), CounterFSMState::INIT);
 }
 
-TEST(TestFilterBase, predictsCurrentStateAfterLastObservation) {
+TEST(TestFilterBase, predictsCurrentStateAfterLastObservation)
+{
   CounterFilter filter(4);
   filter.process(Duration(10), make_update_function(100));
 
@@ -98,7 +107,8 @@ TEST(TestFilterBase, predictsCurrentStateAfterLastObservation) {
   EXPECT_EQ(filter.get_fsm_state(), CounterFSMState::RUN);
 }
 
-TEST(TestFilterBase, replayStatesWhenDelayedObservationIsInserted) {
+TEST(TestFilterBase, replayStatesWhenDelayedObservationIsInserted)
+{
   CounterFilter filter(5);
 
   filter.process(Duration(10), make_update_function(100));
@@ -112,7 +122,8 @@ TEST(TestFilterBase, replayStatesWhenDelayedObservationIsInserted) {
   EXPECT_EQ(current_state.update_count, 3u);
 }
 
-TEST(TestFilterBase, rejectsObservationOlderThanRetainedHistory) {
+TEST(TestFilterBase, rejectsObservationOlderThanRetainedHistory)
+{
   CounterFilter filter(3);
 
   filter.process(Duration(10), make_update_function(100));
@@ -128,7 +139,8 @@ TEST(TestFilterBase, rejectsObservationOlderThanRetainedHistory) {
   EXPECT_EQ(current_state.update_count, 4u);
 }
 
-TEST(TestFilterBase, resetClearsStoredStates) {
+TEST(TestFilterBase, resetClearsStoredStates)
+{
   CounterFilter filter(4);
   filter.process(Duration(10), make_update_function(100));
 

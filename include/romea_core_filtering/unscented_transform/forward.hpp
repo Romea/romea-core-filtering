@@ -26,35 +26,37 @@
 #include "romea_core_filtering/gaussian/distribution.hpp"
 #include "romea_core_filtering/unscented_transform/parameters.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t DIM>
-struct UnscentedTransformForward {
+template<typename Scalar, size_t DIM>
+struct UnscentedTransformForward
+{
   static void to_sigma_points(
-      const UnscentedTransformParameters<Scalar>& parameters,
-      const GaussianDistribution<Scalar, DIM>& gaussian_distribution,
-      typename GaussianDistribution<Scalar, DIM>::SigmaPoints& sigma_points) {
+    const UnscentedTransformParameters<Scalar> & parameters,
+    const GaussianDistribution<Scalar, DIM> & gaussian_distribution,
+    typename GaussianDistribution<Scalar, DIM>::SigmaPoints & sigma_points)
+  {
     assert(sigma_points.size() == parameters.mean_weights.size());
 
-    const Scalar& gamma = parameters.gamma;
-    const auto& first_moment = gaussian_distribution.first_moment;
-    const auto& second_moment = gaussian_distribution.second_moment;
+    const Scalar & gamma = parameters.gamma;
+    const auto & first_moment = gaussian_distribution.first_moment;
+    const auto & second_moment = gaussian_distribution.second_moment;
 
     Eigen::JacobiSVD<Eigen::Matrix<Scalar, -1, -1>> svd(
-        second_moment, Eigen::ComputeThinU | Eigen::ComputeThinV);
+      second_moment, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
     auto sqrCovariance =
-        svd.matrixU() *
-        Eigen::Matrix<Scalar, DIM, 1>(svd.singularValues().array().sqrt())
-            .asDiagonal() *
-        svd.matrixV().transpose();
+      svd.matrixU() *
+      Eigen::Matrix<Scalar, DIM, 1>(svd.singularValues().array().sqrt()).asDiagonal() *
+      svd.matrixV().transpose();
 
     sigma_points[0] = first_moment;
     for (size_t n = 0; n < DIM; ++n) {
       sigma_points[n + 1] = first_moment + gamma * sqrCovariance.col(int(n));
-      sigma_points[n + 1 + DIM] =
-          first_moment - gamma * sqrCovariance.col(int(n));
+      sigma_points[n + 1 + DIM] = first_moment - gamma * sqrCovariance.col(int(n));
     }
   }
 };

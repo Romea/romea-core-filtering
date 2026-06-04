@@ -27,16 +27,19 @@
 // romea
 #include "romea_core_filtering/filter/filter_base.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <class State, class FSMState, class Duration>
-class ParticleFilter : public FilterBase<State, FSMState, Duration> {
- public:
-  ParticleFilter(const size_t& state_pool_size,
-                 const size_t& number_of_particles)
-      : FilterBase<State, FSMState, Duration>(state_pool_size),
-        number_of_particles_(number_of_particles) {
+template<class State, class FSMState, class Duration>
+class ParticleFilter : public FilterBase<State, FSMState, Duration>
+{
+public:
+  ParticleFilter(const size_t & state_pool_size, const size_t & number_of_particles)
+  : FilterBase<State, FSMState, Duration>(state_pool_size),
+    number_of_particles_(number_of_particles)
+  {
     for (size_t n = 0; n < state_pool_size; ++n) {
       std::unique_ptr<State> state(new State(number_of_particles));
       this->state_vector_pool_.push_back(std::move(state));
@@ -45,11 +48,9 @@ class ParticleFilter : public FilterBase<State, FSMState, Duration> {
 
   virtual ~ParticleFilter() = default;
 
-  virtual size_t get_number_of_particles() const {
-    return number_of_particles_;
-  }
+  virtual size_t get_number_of_particles() const { return number_of_particles_; }
 
- private:
+private:
   size_t number_of_particles_;
 };
 

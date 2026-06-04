@@ -27,36 +27,39 @@
 #include "romea_core_filtering/unscented_transform/forward.hpp"
 #include "romea_core_filtering/unscented_transform/inverse.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-class UKFUpdaterBase {
- public:
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
+class UKFUpdaterBase
+{
+public:
   using State = GaussianState<Scalar, StateDIM>;
   using Observation = GaussianObservation<Scalar, ObservationDIM>;
   using CorrelationMatrix = Eigen::Matrix<Scalar, StateDIM, ObservationDIM>;
 
- public:
-  UKFUpdaterBase(const double& UTKappa, const double& UTAlpha,
-                 const double& UTBeta,
-                 const double& maximal_mahalanobis_distance);
+public:
+  UKFUpdaterBase(
+    const double & UTKappa,
+    const double & UTAlpha,
+    const double & UTBeta,
+    const double & maximal_mahalanobis_distance);
 
   virtual ~UKFUpdaterBase() = default;
 
- protected:
-  bool update_state_(State& state);
+protected:
+  bool update_state_(State & state);
 
-  bool update_state_(State& state, const Observation& observation);
+  bool update_state_(State & state, const Observation & observation);
 
-  void compute_state_sigma_points_(const State& state);
+  void compute_state_sigma_points_(const State & state);
 
- protected:
+protected:
   UnscentedTransformParameters<Scalar> unscented_transform_parameters_;
-  typename GaussianDistribution<Scalar, StateDIM>::SigmaPoints
-      state_sigma_points_;
-  typename GaussianDistribution<Scalar, ObservationDIM>::SigmaPoints
-      propagated_sigma_points_;
+  typename GaussianDistribution<Scalar, StateDIM>::SigmaPoints state_sigma_points_;
+  typename GaussianDistribution<Scalar, ObservationDIM>::SigmaPoints propagated_sigma_points_;
   GaussianObservation<Scalar, ObservationDIM> propagated_state_;
 
   typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn Inn_;
@@ -69,41 +72,41 @@ class UKFUpdaterBase {
 };
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 UKFUpdaterBase<Scalar, StateDIM, ObservationDIM>::UKFUpdaterBase(
-    const double& UTKappa, const double& UTAlpha, const double& UTBeta,
-    const double& maximal_mahalanobis_distance)
-    : unscented_transform_parameters_(StateDIM, UTKappa, UTAlpha, UTBeta),
-      state_sigma_points_(2 * StateDIM + 1),
-      propagated_sigma_points_(2 * StateDIM + 1),
-      propagated_state_(),
-      Inn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM,
-                                         ObservationDIM>::Inn>::zero()),
-      QInn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM,
-                                          ObservationDIM>::QInn>::zero()),
-      QInnInverse_(
-          Zero<typename KFUpdaterTraits<Scalar, StateDIM,
-                                        ObservationDIM>::QInn>::zero()),
-      K_(Zero<typename KFUpdaterTraits<Scalar, StateDIM,
-                                       ObservationDIM>::K>::zero()),
-      mahalanobis_distance_(std::numeric_limits<Scalar>::max()),
-      maximal_mahalanobis_distance_(maximal_mahalanobis_distance) {}
-
-//-----------------------------------------------------------------------------
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-void UKFUpdaterBase<Scalar, StateDIM, ObservationDIM>::
-    compute_state_sigma_points_(const State& state) {
-  UnscentedTransformForward<Scalar, StateDIM>::to_sigma_points(
-      unscented_transform_parameters_, state, state_sigma_points_);
+  const double & UTKappa,
+  const double & UTAlpha,
+  const double & UTBeta,
+  const double & maximal_mahalanobis_distance)
+: unscented_transform_parameters_(StateDIM, UTKappa, UTAlpha, UTBeta),
+  state_sigma_points_(2 * StateDIM + 1),
+  propagated_sigma_points_(2 * StateDIM + 1),
+  propagated_state_(),
+  Inn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn>::zero()),
+  QInn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn>::zero()),
+  QInnInverse_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn>::zero()),
+  K_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K>::zero()),
+  mahalanobis_distance_(std::numeric_limits<Scalar>::max()),
+  maximal_mahalanobis_distance_(maximal_mahalanobis_distance)
+{
 }
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
+void UKFUpdaterBase<Scalar, StateDIM, ObservationDIM>::compute_state_sigma_points_(
+  const State & state)
+{
+  UnscentedTransformForward<Scalar, StateDIM>::to_sigma_points(
+    unscented_transform_parameters_, state, state_sigma_points_);
+}
+
+//-----------------------------------------------------------------------------
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 bool UKFUpdaterBase<Scalar, StateDIM, ObservationDIM>::update_state_(
-    State& state, const Observation& observation) {
+  State & state, const Observation & observation)
+{
   UnscentedTransformInverse<Scalar, ObservationDIM>::to_gaussian(
-      unscented_transform_parameters_, propagated_sigma_points_,
-      propagated_state_);
+    unscented_transform_parameters_, propagated_sigma_points_, propagated_state_);
 
   this->Inn_ = observation.Y() - propagated_state_.Y();
   this->QInn_ = observation.R() + propagated_state_.R();
@@ -111,21 +114,22 @@ bool UKFUpdaterBase<Scalar, StateDIM, ObservationDIM>::update_state_(
 }
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-bool UKFUpdaterBase<Scalar, StateDIM, ObservationDIM>::update_state_(
-    State& state) {
-  mahalanobis_distance_ =
-      KFMahalanobis<Scalar, ObservationDIM>::compute(Inn_, QInn_, QInnInverse_);
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
+bool UKFUpdaterBase<Scalar, StateDIM, ObservationDIM>::update_state_(State & state)
+{
+  mahalanobis_distance_ = KFMahalanobis<Scalar, ObservationDIM>::compute(Inn_, QInn_, QInnInverse_);
   if (mahalanobis_distance_ < maximal_mahalanobis_distance_) {
     UKFCorrelation<Scalar, StateDIM, ObservationDIM>::compute(
-        unscented_transform_parameters_, state, propagated_state_,
-        state_sigma_points_, propagated_sigma_points_, K_);
+      unscented_transform_parameters_,
+      state,
+      propagated_state_,
+      state_sigma_points_,
+      propagated_sigma_points_,
+      K_);
 
     K_ *= QInnInverse_;
-    KFUpdateStateVector<Scalar, StateDIM, ObservationDIM>::compute(state.X(),
-                                                                   Inn_, K_);
-    KFUpdateStateCovariance<Scalar, StateDIM, ObservationDIM>::compute(
-        state.P(), QInn_, K_);
+    KFUpdateStateVector<Scalar, StateDIM, ObservationDIM>::compute(state.X(), Inn_, K_);
+    KFUpdateStateCovariance<Scalar, StateDIM, ObservationDIM>::compute(state.P(), QInn_, K_);
     return true;
   } else {
     return false;

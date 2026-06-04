@@ -18,42 +18,39 @@
 
 #include "romea_core_filtering/gaussian/distribution.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t DIM>
-struct GaussianObservation : GaussianDistribution<Scalar, DIM> {
+template<typename Scalar, size_t DIM>
+struct GaussianObservation : GaussianDistribution<Scalar, DIM>
+{
   GaussianObservation() : GaussianDistribution<Scalar, DIM>() {}
 
   virtual ~GaussianObservation() = default;
 
-  typename GaussianDistribution<Scalar, DIM>::FirstMoment& Y() {
+  typename GaussianDistribution<Scalar, DIM>::FirstMoment & Y() { return this->first_moment; }
+
+  const typename GaussianDistribution<Scalar, DIM>::FirstMoment & Y() const
+  {
     return this->first_moment;
   }
 
-  const typename GaussianDistribution<Scalar, DIM>::FirstMoment& Y() const {
-    return this->first_moment;
-  }
+  Scalar & Y(const size_t & i) { return this->first_moment(i); }
 
-  Scalar& Y(const size_t& i) { return this->first_moment(i); }
+  const Scalar & Y(const size_t & i) const { return this->first_moment(i); }
 
-  const Scalar& Y(const size_t& i) const { return this->first_moment(i); }
+  typename GaussianDistribution<Scalar, DIM>::SecondMoment & R() { return this->second_moment; }
 
-  typename GaussianDistribution<Scalar, DIM>::SecondMoment& R() {
+  const typename GaussianDistribution<Scalar, DIM>::SecondMoment & R() const
+  {
     return this->second_moment;
   }
 
-  const typename GaussianDistribution<Scalar, DIM>::SecondMoment& R() const {
-    return this->second_moment;
-  }
+  const Scalar & R(const size_t & i, const size_t & j) const { return this->second_moment(i, j); }
 
-  const Scalar& R(const size_t& i, const size_t& j) const {
-    return this->second_moment(i, j);
-  }
-
-  Scalar& R(const size_t& i, const size_t& j) {
-    return this->second_moment(i, j);
-  }
+  Scalar & R(const size_t & i, const size_t & j) { return this->second_moment(i, j); }
 };
 
 }  // namespace core

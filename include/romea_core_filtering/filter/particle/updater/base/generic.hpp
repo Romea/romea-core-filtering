@@ -23,30 +23,34 @@
 #include "romea_core_filtering/filter/particle/state.hpp"
 #include "romea_core_filtering/filter/particle/updater/algorithm/resampling.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-class PFUpdaterBase {
- public:
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
+class PFUpdaterBase
+{
+public:
   using RowMajorVector = Eigen::Array<Scalar, 1, Eigen::Dynamic>;
 
- public:
-  explicit PFUpdaterBase(const std::size_t& number_of_particles);
+public:
+  explicit PFUpdaterBase(const std::size_t & number_of_particles);
 
   virtual ~PFUpdaterBase() = default;
 
- protected:
+protected:
   size_t number_of_particles_;
   ParticleFilterResampling<Scalar, StateDIM> resampling_;
 };
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 PFUpdaterBase<Scalar, StateDIM, ObservationDIM>::PFUpdaterBase(
-    const std::size_t& number_of_particles)
-    : number_of_particles_(number_of_particles),
-      resampling_(number_of_particles) {}
+  const std::size_t & number_of_particles)
+: number_of_particles_(number_of_particles), resampling_(number_of_particles)
+{
+}
 
 }  // namespace core
 }  // namespace romea

@@ -19,21 +19,26 @@
 // romea
 #include "romea_core_filtering/filter/meta_state.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <class State, class FSMState, class Duration>
-class FilterPredictorBase {
- public:
+template<class State, class FSMState, class Duration>
+class FilterPredictorBase
+{
+public:
   FilterPredictorBase() {}
 
   virtual ~FilterPredictorBase() = default;
 
-  virtual void predict(const Duration& previous_duration,
-                       const FSMState& previous_fsm_state,
-                       const State& previous_state_vector,
-                       const Duration& currentDuration,
-                       FSMState& current_fsm_State, State& current_state) = 0;
+  virtual void predict(
+    const Duration & previous_duration,
+    const FSMState & previous_fsm_state,
+    const State & previous_state_vector,
+    const Duration & currentDuration,
+    FSMState & current_fsm_State,
+    State & current_state) = 0;
 };
 
 }  // namespace core

@@ -22,10 +22,12 @@
 // romea
 #include "romea_core_filtering/filter/kalman/updater/base/linear.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 using EKFUpdaterBase = LKFUpdaterBase<Scalar, StateDIM, ObservationDIM>;
 
 }  // namespace core

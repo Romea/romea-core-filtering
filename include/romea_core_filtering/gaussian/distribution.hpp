@@ -22,19 +22,22 @@
 // std
 #include <vector>
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t DIM>
-struct GaussianDistribution {
+template<typename Scalar, size_t DIM>
+struct GaussianDistribution
+{
   using FirstMoment = Eigen::Matrix<Scalar, DIM, 1>;
   using SecondMoment = Eigen::Matrix<Scalar, DIM, DIM>;
-  using SigmaPoints =
-      std::vector<FirstMoment, Eigen::aligned_allocator<FirstMoment>>;
+  using SigmaPoints = std::vector<FirstMoment, Eigen::aligned_allocator<FirstMoment>>;
 
   GaussianDistribution()
-      : first_moment(FirstMoment::Constant(NAN)),
-        second_moment(SecondMoment::Zero()) {}
+  : first_moment(FirstMoment::Constant(NAN)), second_moment(SecondMoment::Zero())
+  {
+  }
 
   virtual ~GaussianDistribution() = default;
 
@@ -44,8 +47,9 @@ struct GaussianDistribution {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(Scalar, DIM)
 };
 
-template <typename Scalar>
-struct GaussianDistribution<Scalar, 1> {
+template<typename Scalar>
+struct GaussianDistribution<Scalar, 1>
+{
   using FirstMoment = Scalar;
   using SecondMoment = Scalar;
   using SigmaPoints = std::vector<Scalar>;

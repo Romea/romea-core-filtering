@@ -19,19 +19,20 @@
 // Eigen
 #include <Eigen/Core>
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
-template <typename Scalar, size_t DIM>
-struct ParticleFilterState {
- public:
-  typedef Eigen::Array<Scalar, 1, Eigen::Dynamic, Eigen::RowMajor>
-      RowMajorVector;
-  typedef Eigen::Array<Scalar, DIM, Eigen::Dynamic, Eigen::RowMajor>
-      RowMajorMatrix;
+template<typename Scalar, size_t DIM>
+struct ParticleFilterState
+{
+public:
+  typedef Eigen::Array<Scalar, 1, Eigen::Dynamic, Eigen::RowMajor> RowMajorVector;
+  typedef Eigen::Array<Scalar, DIM, Eigen::Dynamic, Eigen::RowMajor> RowMajorMatrix;
 
- public:
-  explicit ParticleFilterState(const size_t& number_of_particles);
+public:
+  explicit ParticleFilterState(const size_t & number_of_particles);
 
   virtual ~ParticleFilterState() = default;
 
@@ -42,16 +43,17 @@ struct ParticleFilterState {
 };
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t DIM>
-ParticleFilterState<Scalar, DIM>::ParticleFilterState(
-    const size_t& number_of_particles)
-    : particles(RowMajorMatrix::Constant(DIM, number_of_particles, NAN)),
-      weights(RowMajorVector::Constant(number_of_particles,
-                                       1. / number_of_particles)) {}
+template<typename Scalar, size_t DIM>
+ParticleFilterState<Scalar, DIM>::ParticleFilterState(const size_t & number_of_particles)
+: particles(RowMajorMatrix::Constant(DIM, number_of_particles, NAN)),
+  weights(RowMajorVector::Constant(number_of_particles, 1. / number_of_particles))
+{
+}
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t DIM>
-void ParticleFilterState<Scalar, DIM>::reset() {
+template<typename Scalar, size_t DIM>
+void ParticleFilterState<Scalar, DIM>::reset()
+{
   particles.setConstant(NAN);
   weights.setConstant(1. / weights.cols());
 }

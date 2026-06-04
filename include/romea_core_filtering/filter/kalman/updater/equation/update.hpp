@@ -20,39 +20,42 @@
 #include "romea_core_filtering/filter/kalman/updater/traits.hpp"
 #include "romea_core_filtering/gaussian/state.hpp"
 
-namespace romea {
-namespace core {
+namespace romea
+{
+namespace core
+{
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-struct KFUpdateStateVector {
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
+struct KFUpdateStateVector
+{
   static void compute(
-      typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::X& X,
-      const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn&
-          Inn,
-      const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K& K) {
+    typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::X & X,
+    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn & Inn,
+    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K & K)
+  {
     X += K * Inn;
   }
 };
 
 //-----------------------------------------------------------------------------
-template <typename Scalar, size_t StateDIM, size_t ObservationDIM>
-struct KFUpdateStateCovariance {
+template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
+struct KFUpdateStateCovariance
+{
   static void compute(
-      typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::P& P,
-      const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn&
-          QInn,
-      const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K& K) {
+    typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::P & P,
+    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn & QInn,
+    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K & K)
+  {
     P -= K * QInn * K.transpose();
   }
 };
 
 //-----------------------------------------------------------------------------
-template <typename Scalar>
-struct KFUpdateStateCovariance<Scalar, 1, 1> {
-  static void compute(Scalar& P, const Scalar& QInn, const Scalar& K) {
-    P -= K * QInn * K;
-  }
+template<typename Scalar>
+struct KFUpdateStateCovariance<Scalar, 1, 1>
+{
+  static void compute(Scalar & P, const Scalar & QInn, const Scalar & K) { P -= K * QInn * K; }
 };
 
 }  // namespace core
