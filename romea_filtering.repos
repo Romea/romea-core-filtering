@@ -1,5 +1,7 @@
 repositories:
+  romea_core/romea_common:
+    type: git
+    url: git@forge.inrae.fr:romea_core/romea_common.git
   romea_core/romea_filtering:
     type: git
     url: git@forge.inrae.fr:romea_core/romea_filtering.git
-
