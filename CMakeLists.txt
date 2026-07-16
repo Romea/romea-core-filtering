@@ -2,29 +2,24 @@ cmake_minimum_required(VERSION 3.5)
 
 project(
   "romea_core_filtering"
-  VERSION 0.1.0
+  VERSION 1.0.0
 #  DESCRIPTION
 #  HOMEPAGE_URL
   LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+include(GNUInstallDirs)
 
-# find_package( PkgConfig )
-# pkg_check_modules( EIGEN3 REQUIRED eigen3 )
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
 target_include_directories(
   ${PROJECT_NAME}
   INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-            ${EIGEN3_INCLUDE_DIRS})
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-#target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
-#target_link_libraries(${PROJECT_NAME} INTERFACE ${EIGEN3_LIBRARIES})
-
-include(GNUInstallDirs)
+target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
+target_link_libraries(${PROJECT_NAME} INTERFACE Eigen3::Eigen)
 
 install(
   TARGETS ${PROJECT_NAME}
@@ -61,14 +56,8 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}
 
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 
-include_directories(include  ${EIGEN3_INCLUDE_DIRS})
-
-option(BUILD_TESTING "BUILD WITH TESTS" ON)
-
+include(CTest)
 if(BUILD_TESTING)
-    enable_testing()
-    add_subdirectory(test)
+  find_package(romea_core_common REQUIRED)
+  add_subdirectory(test)
 endif()
-
-
-
