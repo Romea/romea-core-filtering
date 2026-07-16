@@ -95,7 +95,9 @@ TEST(TestFilter, processesLongSequenceWithPeriodicDelayedObservations)
   }
 
   TimeState current_state;
-  ASSERT_TRUE(filter.get_current_state(Duration(49000), &current_state));
+  ASSERT_EQ(
+    filter.get_current_state(Duration(49000), &current_state),
+    romea::core::FilterGetCurrentStateStatus::AVAILABLE);
 
   EXPECT_EQ(current_state.elapsed_time.count(), 49000);
   EXPECT_EQ(current_state.update_count, 50u);

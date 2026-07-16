@@ -72,7 +72,9 @@ TEST(TestKalmanFilter, storesGaussianStatesAndUsesRegisteredPredictor)
   filter.process(Duration(10), make_scalar_update(100., 4.));
 
   State current_state;
-  ASSERT_TRUE(filter.get_current_state(Duration(15), &current_state));
+  ASSERT_EQ(
+    filter.get_current_state(Duration(15), &current_state),
+    romea::core::FilterGetCurrentStateStatus::AVAILABLE);
 
   EXPECT_DOUBLE_EQ(current_state.X(), 105.);
   EXPECT_DOUBLE_EQ(current_state.P(), 4.);

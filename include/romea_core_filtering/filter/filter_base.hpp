@@ -21,7 +21,6 @@
 #include <cstddef>
 #include <deque>
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -37,6 +36,19 @@ namespace romea
 {
 namespace core
 {
+
+enum class FilterProcessStatus
+{
+  ACCEPTED,
+  OUT_OF_HISTORY,
+};
+
+enum class FilterGetCurrentStateStatus
+{
+  AVAILABLE,
+  UNAVAILABLE,
+  OUT_OF_HISTORY,
+};
 
 template<class State, class FSMState, class Duration>
 class FilterBase
@@ -60,9 +72,9 @@ public:
 
   FSMState get_fsm_state() const;
 
-  bool get_current_state(const Duration & duration, State * current_state);
+  FilterGetCurrentStateStatus get_current_state(const Duration & duration, State * current_state);
 
-  void process(const Duration & duration, UpdateFunction && update_function);
+  FilterProcessStatus process(const Duration & duration, UpdateFunction && update_function);
 
   void reset();
 
@@ -107,7 +119,6 @@ FSMState FilterBase<State, FSMState, Duration>::get_fsm_state() const
 template<class State, class FSMState, class Duration>
 void FilterBase<State, FSMState, Duration>::reset()
 {
-  std::cout << " reset ???........................................" << std::endl;
   std::lock_guard<std::mutex> lock(mutex_);
 
   // Reset stateVectorPool
@@ -121,17 +132,16 @@ void FilterBase<State, FSMState, Duration>::reset()
 
 //-----------------------------------------------------------------------------
 template<class State, class FSMState, class Duration>
-bool FilterBase<State, FSMState, Duration>::get_current_state(
+FilterGetCurrentStateStatus FilterBase<State, FSMState, Duration>::get_current_state(
   const Duration & currentDuration, State * current_state)
 {
-  //  std::cout << " get current state "<< std::endl;
   std::lock_guard<std::mutex> lock(mutex_);
 
   assert(current_state);
 
   // If no metaStates have been inserted
   if (meta_states_.empty()) {
-    return false;
+    return FilterGetCurrentStateStatus::UNAVAILABLE;
   }
 
   // Search the position of required state vector
@@ -142,7 +152,7 @@ bool FilterBase<State, FSMState, Duration>::get_current_state(
 
   // If the date out of range
   if (Ir == meta_states_.rend()) {
-    return false;
+    return FilterGetCurrentStateStatus::OUT_OF_HISTORY;
   }
 
   // Estimate the current state vector
@@ -165,12 +175,12 @@ bool FilterBase<State, FSMState, Duration>::get_current_state(
     current_fsm_State,
     *current_state);
 
-  return true;
+  return FilterGetCurrentStateStatus::AVAILABLE;
 }
 
 //-----------------------------------------------------------------------------
 template<class State, class FSMState, class Duration>
-void FilterBase<State, FSMState, Duration>::process(
+FilterProcessStatus FilterBase<State, FSMState, Duration>::process(
   const Duration & duration, UpdateFunction && update_function)
 {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -186,16 +196,13 @@ void FilterBase<State, FSMState, Duration>::process(
 
     // Discard metaState prior to the first metaState
     if (Ir == meta_states_.rend() || duration < meta_states_[0].duration) {
-      std::cout << " Discard metaState because is prior to the first metaState" << std::endl;
-      return;
+      return FilterProcessStatus::OUT_OF_HISTORY;
     }
 
     I = Ir.base();
   }
 
   // Insert metaState
-  //  std::cout << " insert meta state " <<
-  //  std::distance(std::begin(meta_states_),I)<< std::endl;
   if (meta_states_.size() < state_vector_pool_.size()) {
     assert(state_vector_pool_[meta_states_.size()] != nullptr);
     auto & state = state_vector_pool_[meta_states_.size()];
@@ -238,6 +245,8 @@ void FilterBase<State, FSMState, Duration>::process(
     I++;
     J++;
   }
+
+  return FilterProcessStatus::ACCEPTED;
 }
 
 }  // namespace core
