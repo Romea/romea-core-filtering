@@ -91,8 +91,8 @@ TEST(TestFilterBase, returnsFalseWhenNoStateHasBeenInserted)
   CounterState current_state;
 
   EXPECT_EQ(
-    filter.get_current_state(Duration(0), &current_state),
-    romea::core::FilterGetCurrentStateStatus::UNAVAILABLE);
+    filter.get_state(Duration(0), &current_state),
+    romea::core::FilterGetStateStatus::EMPTY);
   EXPECT_EQ(filter.get_fsm_state(), CounterFSMState::INIT);
 }
 
@@ -105,8 +105,8 @@ TEST(TestFilterBase, predictsCurrentStateAfterLastObservation)
 
   CounterState current_state;
   ASSERT_EQ(
-    filter.get_current_state(Duration(15), &current_state),
-    romea::core::FilterGetCurrentStateStatus::AVAILABLE);
+    filter.get_state(Duration(15), &current_state),
+    romea::core::FilterGetStateStatus::AVAILABLE);
 
   EXPECT_EQ(current_state.value, 115);
   EXPECT_EQ(current_state.update_count, 1u);
@@ -123,8 +123,8 @@ TEST(TestFilterBase, replayStatesWhenDelayedObservationIsInserted)
 
   CounterState current_state;
   ASSERT_EQ(
-    filter.get_current_state(Duration(35), &current_state),
-    romea::core::FilterGetCurrentStateStatus::AVAILABLE);
+    filter.get_state(Duration(35), &current_state),
+    romea::core::FilterGetStateStatus::AVAILABLE);
 
   EXPECT_EQ(current_state.value, 335);
   EXPECT_EQ(current_state.update_count, 3u);
@@ -148,18 +148,18 @@ TEST(TestFilterBase, rejectsObservationOlderThanRetainedHistory)
     romea::core::FilterProcessStatus::ACCEPTED);
   EXPECT_EQ(
     filter.process(Duration(5), make_update_function(500)),
-    romea::core::FilterProcessStatus::OUT_OF_HISTORY);
+    romea::core::FilterProcessStatus::TOO_OLD);
 
   CounterState current_state;
   ASSERT_EQ(
-    filter.get_current_state(Duration(40), &current_state),
-    romea::core::FilterGetCurrentStateStatus::AVAILABLE);
+    filter.get_state(Duration(40), &current_state),
+    romea::core::FilterGetStateStatus::AVAILABLE);
 
   EXPECT_EQ(current_state.value, 440);
   EXPECT_EQ(current_state.update_count, 4u);
 }
 
-TEST(TestFilterBase, returnsOutOfHistoryWhenCurrentStateIsOlderThanRetainedHistory)
+TEST(TestFilterBase, returnsTooOldWhenRequestedStateIsOlderThanRetainedHistory)
 {
   CounterFilter filter(3);
 
@@ -170,8 +170,8 @@ TEST(TestFilterBase, returnsOutOfHistoryWhenCurrentStateIsOlderThanRetainedHisto
 
   CounterState current_state;
   EXPECT_EQ(
-    filter.get_current_state(Duration(5), &current_state),
-    romea::core::FilterGetCurrentStateStatus::OUT_OF_HISTORY);
+    filter.get_state(Duration(5), &current_state),
+    romea::core::FilterGetStateStatus::TOO_OLD);
 }
 
 TEST(TestFilterBase, resetClearsStoredStates)
@@ -181,13 +181,13 @@ TEST(TestFilterBase, resetClearsStoredStates)
 
   CounterState current_state;
   ASSERT_EQ(
-    filter.get_current_state(Duration(10), &current_state),
-    romea::core::FilterGetCurrentStateStatus::AVAILABLE);
+    filter.get_state(Duration(10), &current_state),
+    romea::core::FilterGetStateStatus::AVAILABLE);
 
   filter.reset();
 
   EXPECT_EQ(
-    filter.get_current_state(Duration(10), &current_state),
-    romea::core::FilterGetCurrentStateStatus::UNAVAILABLE);
+    filter.get_state(Duration(10), &current_state),
+    romea::core::FilterGetStateStatus::EMPTY);
   EXPECT_EQ(filter.get_fsm_state(), CounterFSMState::INIT);
 }

@@ -40,14 +40,14 @@ namespace core
 enum class FilterProcessStatus
 {
   ACCEPTED,
-  OUT_OF_HISTORY,
+  TOO_OLD,
 };
 
-enum class FilterGetCurrentStateStatus
+enum class FilterGetStateStatus
 {
   AVAILABLE,
-  UNAVAILABLE,
-  OUT_OF_HISTORY,
+  EMPTY,
+  TOO_OLD,
 };
 
 template<class State, class FSMState, class Duration>
@@ -72,7 +72,7 @@ public:
 
   FSMState get_fsm_state() const;
 
-  FilterGetCurrentStateStatus get_current_state(const Duration & duration, State * current_state);
+  FilterGetStateStatus get_state(const Duration & duration, State * state);
 
   FilterProcessStatus process(const Duration & duration, UpdateFunction && update_function);
 
@@ -132,27 +132,27 @@ void FilterBase<State, FSMState, Duration>::reset()
 
 //-----------------------------------------------------------------------------
 template<class State, class FSMState, class Duration>
-FilterGetCurrentStateStatus FilterBase<State, FSMState, Duration>::get_current_state(
-  const Duration & currentDuration, State * current_state)
+FilterGetStateStatus FilterBase<State, FSMState, Duration>::get_state(
+  const Duration & duration, State * state)
 {
   std::lock_guard<std::mutex> lock(mutex_);
 
-  assert(current_state);
+  assert(state);
 
   // If no metaStates have been inserted
   if (meta_states_.empty()) {
-    return FilterGetCurrentStateStatus::UNAVAILABLE;
+    return FilterGetStateStatus::EMPTY;
   }
 
   // Search the position of required state vector
   auto Ir = meta_states_.rbegin();
-  while (currentDuration < (*Ir).duration && Ir != meta_states_.rend()) {
+  while (Ir != meta_states_.rend() && duration < (*Ir).duration) {
     Ir++;
   }
 
   // If the date out of range
   if (Ir == meta_states_.rend()) {
-    return FilterGetCurrentStateStatus::OUT_OF_HISTORY;
+    return FilterGetStateStatus::TOO_OLD;
   }
 
   // Estimate the current state vector
@@ -171,11 +171,11 @@ FilterGetCurrentStateStatus FilterBase<State, FSMState, Duration>::get_current_s
     previous_duration,
     previous_fsm_state,
     *previous_state,
-    currentDuration,
+    duration,
     current_fsm_State,
-    *current_state);
+    *state);
 
-  return FilterGetCurrentStateStatus::AVAILABLE;
+  return FilterGetStateStatus::AVAILABLE;
 }
 
 //-----------------------------------------------------------------------------
@@ -196,7 +196,7 @@ FilterProcessStatus FilterBase<State, FSMState, Duration>::process(
 
     // Discard metaState prior to the first metaState
     if (Ir == meta_states_.rend() || duration < meta_states_[0].duration) {
-      return FilterProcessStatus::OUT_OF_HISTORY;
+      return FilterProcessStatus::TOO_OLD;
     }
 
     I = Ir.base();

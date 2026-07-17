@@ -149,7 +149,7 @@ filter->process(observation_time, std::move(update_function));
 // ...
 
 State current_state;
-filter->get_current_state(query_time, &current_state);
+filter->get_state(query_time, &current_state);
 ```
 
 The filtering package provides the asynchronous filter base and the reusable equations. The application package provides `State`, `FSMState`, `MyPredictor` and the update functions.
