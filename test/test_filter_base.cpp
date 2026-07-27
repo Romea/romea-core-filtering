@@ -57,15 +57,23 @@ public:
     current_state.value += (current_duration - previous_duration).count();
     current_fsm_state = previous_fsm_state;
   }
+
+  Duration maximal_extrapolation_duration() const override { return maximal_extrapolation_duration_; }
+
+  Duration maximal_extrapolation_duration_ = Duration::max();
 };
 
 class CounterFilter : public romea::core::FilterBase<CounterState, CounterFSMState, Duration>
 {
 public:
-  explicit CounterFilter(const size_t & state_pool_size)
+  explicit CounterFilter(
+    const size_t & state_pool_size,
+    const Duration & maximal_extrapolation_duration = Duration::max())
   : romea::core::FilterBase<CounterState, CounterFSMState, Duration>(state_pool_size)
   {
-    register_predictor(std::make_unique<CounterPredictor>());
+    auto predictor = std::make_unique<CounterPredictor>();
+    predictor->maximal_extrapolation_duration_ = maximal_extrapolation_duration;
+    register_predictor(std::move(predictor));
     for (size_t n = 0; n < state_pool_size; ++n) {
       auto state = std::make_unique<CounterState>();
       state_vector_pool_.push_back(std::move(state));
@@ -172,6 +180,18 @@ TEST(TestFilterBase, returnsTooOldWhenRequestedStateIsOlderThanRetainedHistory)
   EXPECT_EQ(
     filter.get_state(Duration(5), &current_state),
     romea::core::FilterGetStateStatus::TOO_OLD);
+}
+
+TEST(TestFilterBase, returnsTooFarWhenRequestedStateExceedsMaximalExtrapolationDuration)
+{
+  CounterFilter filter(4, Duration(5));
+
+  filter.process(Duration(10), make_update_function(100));
+
+  CounterState current_state;
+  EXPECT_EQ(
+    filter.get_state(Duration(16), &current_state),
+    romea::core::FilterGetStateStatus::TOO_FAR);
 }
 
 TEST(TestFilterBase, resetClearsStoredStates)

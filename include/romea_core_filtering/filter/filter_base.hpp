@@ -48,6 +48,7 @@ enum class FilterGetStateStatus
   AVAILABLE,
   EMPTY,
   TOO_OLD,
+  TOO_FAR,
 };
 
 template<class State, class FSMState, class Duration>
@@ -142,6 +143,13 @@ FilterGetStateStatus FilterBase<State, FSMState, Duration>::get_state(
   // If no metaStates have been inserted
   if (meta_states_.empty()) {
     return FilterGetStateStatus::EMPTY;
+  }
+
+  if (
+    duration > meta_states_.back().duration &&
+    duration - meta_states_.back().duration > predictor_->maximal_extrapolation_duration())
+  {
+    return FilterGetStateStatus::TOO_FAR;
   }
 
   // Search the position of required state vector

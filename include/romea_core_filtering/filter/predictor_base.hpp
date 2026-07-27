@@ -39,6 +39,8 @@ public:
     const Duration & currentDuration,
     FSMState & current_fsm_State,
     State & current_state) = 0;
+
+  virtual Duration maximal_extrapolation_duration() const { return Duration::max(); }
 };
 
 }  // namespace core
