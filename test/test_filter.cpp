@@ -95,11 +95,12 @@ TEST(TestFilter, processesLongSequenceWithPeriodicDelayedObservations)
   }
 
   TimeState current_state;
+  const auto query = filter.get_state(Duration(49000), &current_state);
   ASSERT_EQ(
-    filter.get_state(Duration(49000), &current_state),
-    romea::core::FilterGetStateStatus::AVAILABLE);
+    query.status,
+    romea::core::FilterStateQueryResult<TimeFSMState>::Status::AVAILABLE);
 
   EXPECT_EQ(current_state.elapsed_time.count(), 49000);
   EXPECT_EQ(current_state.update_count, 50u);
-  EXPECT_EQ(filter.get_fsm_state(), TimeFSMState::RUN);
+  EXPECT_EQ(query.fsm_state, TimeFSMState::RUN);
 }

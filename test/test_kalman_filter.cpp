@@ -72,11 +72,12 @@ TEST(TestKalmanFilter, storesGaussianStatesAndUsesRegisteredPredictor)
   filter.process(Duration(10), make_scalar_update(100., 4.));
 
   State current_state;
+  const auto query = filter.get_state(Duration(15), &current_state);
   ASSERT_EQ(
-    filter.get_state(Duration(15), &current_state),
-    romea::core::FilterGetStateStatus::AVAILABLE);
+    query.status,
+    romea::core::FilterStateQueryResult<KalmanFSMState>::Status::AVAILABLE);
 
   EXPECT_DOUBLE_EQ(current_state.X(), 105.);
   EXPECT_DOUBLE_EQ(current_state.P(), 4.);
-  EXPECT_EQ(filter.get_fsm_state(), KalmanFSMState::RUN);
+  EXPECT_EQ(query.fsm_state, KalmanFSMState::RUN);
 }

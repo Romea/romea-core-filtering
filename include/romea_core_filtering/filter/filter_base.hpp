@@ -37,18 +37,38 @@ namespace romea
 namespace core
 {
 
-enum class FilterProcessStatus
+struct FilterUpdateProcessResult
 {
-  ACCEPTED,
-  TOO_OLD,
+  enum class Status
+  {
+    ACCEPTED,
+    TOO_OLD,
+  };
+
+  Status status;
+
+  bool accepted() const { return status == Status::ACCEPTED; }
+
+  explicit operator bool() const { return accepted(); }
 };
 
-enum class FilterGetStateStatus
+template<class FSMState>
+struct FilterStateQueryResult
 {
-  AVAILABLE,
-  EMPTY,
-  TOO_OLD,
-  TOO_FAR,
+  enum class Status
+  {
+    AVAILABLE,
+    EMPTY,
+    TOO_OLD,
+    TOO_FAR,
+  };
+
+  Status status;
+  FSMState fsm_state;
+
+  bool available() const { return status == Status::AVAILABLE; }
+
+  explicit operator bool() const { return available(); }
 };
 
 template<class State, class FSMState, class Duration>
@@ -71,11 +91,9 @@ public:
 public:
   void register_predictor(PredictorPtr predicter);
 
-  FSMState get_fsm_state() const;
+  FilterStateQueryResult<FSMState> get_state(const Duration & duration, State * state);
 
-  FilterGetStateStatus get_state(const Duration & duration, State * state);
-
-  FilterProcessStatus process(const Duration & duration, UpdateFunction && update_function);
+  FilterUpdateProcessResult process(const Duration & duration, UpdateFunction && update_function);
 
   void reset();
 
@@ -106,18 +124,6 @@ void FilterBase<State, FSMState, Duration>::register_predictor(PredictorPtr pred
 
 //-----------------------------------------------------------------------------
 template<class State, class FSMState, class Duration>
-FSMState FilterBase<State, FSMState, Duration>::get_fsm_state() const
-{
-  std::lock_guard<std::mutex> lock(mutex_);
-  if (meta_states_.empty()) {
-    return FSMState();
-  } else {
-    return meta_states_.back().fsm_state;
-  }
-}
-
-//-----------------------------------------------------------------------------
-template<class State, class FSMState, class Duration>
 void FilterBase<State, FSMState, Duration>::reset()
 {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -133,23 +139,24 @@ void FilterBase<State, FSMState, Duration>::reset()
 
 //-----------------------------------------------------------------------------
 template<class State, class FSMState, class Duration>
-FilterGetStateStatus FilterBase<State, FSMState, Duration>::get_state(
+FilterStateQueryResult<FSMState> FilterBase<State, FSMState, Duration>::get_state(
   const Duration & duration, State * state)
 {
+  using QueryStatus = typename FilterStateQueryResult<FSMState>::Status;
+
   std::lock_guard<std::mutex> lock(mutex_);
 
   assert(state);
 
   // If no metaStates have been inserted
   if (meta_states_.empty()) {
-    return FilterGetStateStatus::EMPTY;
+    return {QueryStatus::EMPTY, FSMState()};
   }
 
   if (
     duration > meta_states_.back().duration &&
-    duration - meta_states_.back().duration > predictor_->maximal_extrapolation_duration())
-  {
-    return FilterGetStateStatus::TOO_FAR;
+    duration - meta_states_.back().duration > predictor_->maximal_extrapolation_duration()) {
+    return {QueryStatus::TOO_FAR, meta_states_.back().fsm_state};
   }
 
   // Search the position of required state vector
@@ -160,7 +167,7 @@ FilterGetStateStatus FilterBase<State, FSMState, Duration>::get_state(
 
   // If the date out of range
   if (Ir == meta_states_.rend()) {
-    return FilterGetStateStatus::TOO_OLD;
+    return {QueryStatus::TOO_OLD, meta_states_.back().fsm_state};
   }
 
   // Estimate the current state vector
@@ -176,19 +183,14 @@ FilterGetStateStatus FilterBase<State, FSMState, Duration>::get_state(
 
   FSMState current_fsm_State;
   predictor_->predict(
-    previous_duration,
-    previous_fsm_state,
-    *previous_state,
-    duration,
-    current_fsm_State,
-    *state);
+    previous_duration, previous_fsm_state, *previous_state, duration, current_fsm_State, *state);
 
-  return FilterGetStateStatus::AVAILABLE;
+  return {QueryStatus::AVAILABLE, current_fsm_State};
 }
 
 //-----------------------------------------------------------------------------
 template<class State, class FSMState, class Duration>
-FilterProcessStatus FilterBase<State, FSMState, Duration>::process(
+FilterUpdateProcessResult FilterBase<State, FSMState, Duration>::process(
   const Duration & duration, UpdateFunction && update_function)
 {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -204,7 +206,7 @@ FilterProcessStatus FilterBase<State, FSMState, Duration>::process(
 
     // Discard metaState prior to the first metaState
     if (Ir == meta_states_.rend() || duration < meta_states_[0].duration) {
-      return FilterProcessStatus::TOO_OLD;
+      return {FilterUpdateProcessResult::Status::TOO_OLD};
     }
 
     I = Ir.base();
@@ -254,7 +256,7 @@ FilterProcessStatus FilterBase<State, FSMState, Duration>::process(
     J++;
   }
 
-  return FilterProcessStatus::ACCEPTED;
+  return {FilterUpdateProcessResult::Status::ACCEPTED};
 }
 
 }  // namespace core

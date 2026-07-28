@@ -98,27 +98,27 @@ TEST(TestFilterBase, returnsFalseWhenNoStateHasBeenInserted)
   CounterFilter filter(4);
   CounterState current_state;
 
+  const auto query = filter.get_state(Duration(0), &current_state);
   EXPECT_EQ(
-    filter.get_state(Duration(0), &current_state),
-    romea::core::FilterGetStateStatus::EMPTY);
-  EXPECT_EQ(filter.get_fsm_state(), CounterFSMState::INIT);
+    query.status,
+    romea::core::FilterStateQueryResult<CounterFSMState>::Status::EMPTY);
+  EXPECT_EQ(query.fsm_state, CounterFSMState::INIT);
 }
 
 TEST(TestFilterBase, predictsCurrentStateAfterLastObservation)
 {
   CounterFilter filter(4);
   EXPECT_EQ(
-    filter.process(Duration(10), make_update_function(100)),
-    romea::core::FilterProcessStatus::ACCEPTED);
+    filter.process(Duration(10), make_update_function(100)).status,
+    romea::core::FilterUpdateProcessResult::Status::ACCEPTED);
 
   CounterState current_state;
-  ASSERT_EQ(
-    filter.get_state(Duration(15), &current_state),
-    romea::core::FilterGetStateStatus::AVAILABLE);
+  const auto query = filter.get_state(Duration(15), &current_state);
+  ASSERT_EQ(query.status, romea::core::FilterStateQueryResult<CounterFSMState>::Status::AVAILABLE);
 
   EXPECT_EQ(current_state.value, 115);
   EXPECT_EQ(current_state.update_count, 1u);
-  EXPECT_EQ(filter.get_fsm_state(), CounterFSMState::RUN);
+  EXPECT_EQ(query.fsm_state, CounterFSMState::RUN);
 }
 
 TEST(TestFilterBase, replayStatesWhenDelayedObservationIsInserted)
@@ -131,8 +131,8 @@ TEST(TestFilterBase, replayStatesWhenDelayedObservationIsInserted)
 
   CounterState current_state;
   ASSERT_EQ(
-    filter.get_state(Duration(35), &current_state),
-    romea::core::FilterGetStateStatus::AVAILABLE);
+    filter.get_state(Duration(35), &current_state).status,
+    romea::core::FilterStateQueryResult<CounterFSMState>::Status::AVAILABLE);
 
   EXPECT_EQ(current_state.value, 335);
   EXPECT_EQ(current_state.update_count, 3u);
@@ -143,25 +143,25 @@ TEST(TestFilterBase, rejectsObservationOlderThanRetainedHistory)
   CounterFilter filter(3);
 
   EXPECT_EQ(
-    filter.process(Duration(10), make_update_function(100)),
-    romea::core::FilterProcessStatus::ACCEPTED);
+    filter.process(Duration(10), make_update_function(100)).status,
+    romea::core::FilterUpdateProcessResult::Status::ACCEPTED);
   EXPECT_EQ(
-    filter.process(Duration(20), make_update_function(200)),
-    romea::core::FilterProcessStatus::ACCEPTED);
+    filter.process(Duration(20), make_update_function(200)).status,
+    romea::core::FilterUpdateProcessResult::Status::ACCEPTED);
   EXPECT_EQ(
-    filter.process(Duration(30), make_update_function(300)),
-    romea::core::FilterProcessStatus::ACCEPTED);
+    filter.process(Duration(30), make_update_function(300)).status,
+    romea::core::FilterUpdateProcessResult::Status::ACCEPTED);
   EXPECT_EQ(
-    filter.process(Duration(40), make_update_function(400)),
-    romea::core::FilterProcessStatus::ACCEPTED);
+    filter.process(Duration(40), make_update_function(400)).status,
+    romea::core::FilterUpdateProcessResult::Status::ACCEPTED);
   EXPECT_EQ(
-    filter.process(Duration(5), make_update_function(500)),
-    romea::core::FilterProcessStatus::TOO_OLD);
+    filter.process(Duration(5), make_update_function(500)).status,
+    romea::core::FilterUpdateProcessResult::Status::TOO_OLD);
 
   CounterState current_state;
   ASSERT_EQ(
-    filter.get_state(Duration(40), &current_state),
-    romea::core::FilterGetStateStatus::AVAILABLE);
+    filter.get_state(Duration(40), &current_state).status,
+    romea::core::FilterStateQueryResult<CounterFSMState>::Status::AVAILABLE);
 
   EXPECT_EQ(current_state.value, 440);
   EXPECT_EQ(current_state.update_count, 4u);
@@ -178,8 +178,8 @@ TEST(TestFilterBase, returnsTooOldWhenRequestedStateIsOlderThanRetainedHistory)
 
   CounterState current_state;
   EXPECT_EQ(
-    filter.get_state(Duration(5), &current_state),
-    romea::core::FilterGetStateStatus::TOO_OLD);
+    filter.get_state(Duration(5), &current_state).status,
+    romea::core::FilterStateQueryResult<CounterFSMState>::Status::TOO_OLD);
 }
 
 TEST(TestFilterBase, returnsTooFarWhenRequestedStateExceedsMaximalExtrapolationDuration)
@@ -190,8 +190,8 @@ TEST(TestFilterBase, returnsTooFarWhenRequestedStateExceedsMaximalExtrapolationD
 
   CounterState current_state;
   EXPECT_EQ(
-    filter.get_state(Duration(16), &current_state),
-    romea::core::FilterGetStateStatus::TOO_FAR);
+    filter.get_state(Duration(16), &current_state).status,
+    romea::core::FilterStateQueryResult<CounterFSMState>::Status::TOO_FAR);
 }
 
 TEST(TestFilterBase, resetClearsStoredStates)
@@ -200,14 +200,16 @@ TEST(TestFilterBase, resetClearsStoredStates)
   filter.process(Duration(10), make_update_function(100));
 
   CounterState current_state;
+  const auto query = filter.get_state(Duration(10), &current_state);
   ASSERT_EQ(
-    filter.get_state(Duration(10), &current_state),
-    romea::core::FilterGetStateStatus::AVAILABLE);
+    query.status,
+    romea::core::FilterStateQueryResult<CounterFSMState>::Status::AVAILABLE);
 
   filter.reset();
 
+  const auto reset_query = filter.get_state(Duration(10), &current_state);
   EXPECT_EQ(
-    filter.get_state(Duration(10), &current_state),
-    romea::core::FilterGetStateStatus::EMPTY);
-  EXPECT_EQ(filter.get_fsm_state(), CounterFSMState::INIT);
+    reset_query.status,
+    romea::core::FilterStateQueryResult<CounterFSMState>::Status::EMPTY);
+  EXPECT_EQ(reset_query.fsm_state, CounterFSMState::INIT);
 }
