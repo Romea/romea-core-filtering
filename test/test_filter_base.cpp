@@ -69,15 +69,22 @@ public:
   explicit CounterFilter(
     const size_t & state_pool_size,
     const Duration & maximal_extrapolation_duration = Duration::max())
-  : romea::core::FilterBase<CounterState, CounterFSMState, Duration>(state_pool_size)
+  : romea::core::FilterBase<CounterState, CounterFSMState, Duration>(
+      state_pool_size, make_predictor(maximal_extrapolation_duration))
   {
-    auto predictor = std::make_unique<CounterPredictor>();
-    predictor->maximal_extrapolation_duration_ = maximal_extrapolation_duration;
-    register_predictor(std::move(predictor));
     for (size_t n = 0; n < state_pool_size; ++n) {
       auto state = std::make_unique<CounterState>();
       state_vector_pool_.push_back(std::move(state));
     }
+  }
+
+private:
+  static std::unique_ptr<CounterPredictor> make_predictor(
+    const Duration & maximal_extrapolation_duration)
+  {
+    auto predictor = std::make_unique<CounterPredictor>();
+    predictor->maximal_extrapolation_duration_ = maximal_extrapolation_duration;
+    return predictor;
   }
 };
 

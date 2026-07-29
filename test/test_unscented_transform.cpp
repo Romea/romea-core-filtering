@@ -61,26 +61,43 @@ void expect_vector_near(
   EXPECT_NEAR(value.z(), expected.z(), tolerance);
 }
 
+void expect_matrix_near(
+  const Eigen::Matrix3d & value, const Eigen::Matrix3d & expected, const double tolerance)
+{
+  for (Eigen::Index row = 0; row < value.rows(); ++row) {
+    for (Eigen::Index col = 0; col < value.cols(); ++col) {
+      EXPECT_NEAR(value(row, col), expected(row, col), tolerance);
+    }
+  }
+}
+
 }  // namespace
 
 TEST(TestUnscentedTransform, convertsGaussianStateToSigmaPoints)
 {
+  const auto state = make_reference_state();
+  const auto parameters = make_reference_parameters();
   const auto sigma_points = make_reference_sigma_points();
 
   ASSERT_EQ(sigma_points.size(), 7u);
-  expect_vector_near(
-    sigma_points[0], Eigen::Vector3d(10.04011967, -6.541962718, 5.773763097), 0.01);
-  expect_vector_near(
-    sigma_points[1], Eigen::Vector3d(10.13285102, -6.489773659, 5.808572647), 0.01);
-  expect_vector_near(
-    sigma_points[2], Eigen::Vector3d(10.09230873, -6.385416757, 5.833716403), 0.01);
-  expect_vector_near(
-    sigma_points[3], Eigen::Vector3d(10.07492922, -6.482009413, 5.896015634), 0.01);
-  expect_vector_near(
-    sigma_points[4], Eigen::Vector3d(9.947388315, -6.594151777, 5.738953548), 0.01);
-  expect_vector_near(sigma_points[5], Eigen::Vector3d(9.98793061, -6.698508679, 5.713809792), 0.01);
-  expect_vector_near(
-    sigma_points[6], Eigen::Vector3d(10.00531012, -6.601916023, 5.651510561), 0.01);
+  expect_vector_near(sigma_points[0], state.X(), 0.01);
+
+  for (size_t n = 1; n <= 3; ++n) {
+    expect_vector_near(sigma_points[n] + sigma_points[n + 3], 2. * state.X(), 0.01);
+  }
+
+  Eigen::Vector3d reconstructed_mean = Eigen::Vector3d::Zero();
+  for (size_t n = 0; n < sigma_points.size(); ++n) {
+    reconstructed_mean += parameters.mean_weights[n] * sigma_points[n];
+  }
+  expect_vector_near(reconstructed_mean, state.X(), 0.01);
+
+  Eigen::Matrix3d reconstructed_covariance = Eigen::Matrix3d::Zero();
+  for (size_t n = 0; n < sigma_points.size(); ++n) {
+    const auto dX = sigma_points[n] - reconstructed_mean;
+    reconstructed_covariance += parameters.covariance_weights[n] * dX * dX.transpose();
+  }
+  expect_matrix_near(reconstructed_covariance, state.P(), 0.01);
 }
 
 TEST(TestUnscentedTransform, reconstructsGaussianObservationFromSigmaPoints)

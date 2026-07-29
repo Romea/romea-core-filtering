@@ -84,13 +84,11 @@ public:
   using UpdateFunction = typename FilterMetaState<State, FSMState, Duration>::UpdateFunction;
 
 public:
-  explicit FilterBase(const size_t & poolSize);
+  FilterBase(const size_t & poolSize, PredictorPtr predictor);
 
   virtual ~FilterBase() = default;
 
 public:
-  void register_predictor(PredictorPtr predicter);
-
   FilterStateQueryResult<FSMState> get_state(const Duration & duration, State * state);
 
   FilterUpdateProcessResult process(const Duration & duration, UpdateFunction && update_function);
@@ -109,17 +107,12 @@ protected:
 
 //-----------------------------------------------------------------------------
 template<class State, class FSMState, class Duration>
-FilterBase<State, FSMState, Duration>::FilterBase(const size_t & state_pool_size)
-: meta_states_(), state_vector_pool_(), predictor_(), mutex_()
+FilterBase<State, FSMState, Duration>::FilterBase(
+  const size_t & state_pool_size, PredictorPtr predictor)
+: meta_states_(), state_vector_pool_(), predictor_(std::move(predictor)), mutex_()
 {
+  assert(predictor_);
   state_vector_pool_.reserve(state_pool_size);
-}
-
-//-----------------------------------------------------------------------------
-template<class State, class FSMState, class Duration>
-void FilterBase<State, FSMState, Duration>::register_predictor(PredictorPtr predicter)
-{
-  predictor_.swap(predicter);
 }
 
 //-----------------------------------------------------------------------------

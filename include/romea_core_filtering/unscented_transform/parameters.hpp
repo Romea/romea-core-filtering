@@ -38,7 +38,7 @@ struct UnscentedTransformParameters
     gamma = std::sqrt(DIM + lambda);
 
     mean_weights[0] = lambda / (DIM + lambda);
-    covariance_weights[0] = mean_weights[0] + 1 + alpha * alpha + beta;
+    covariance_weights[0] = mean_weights[0] + 1 - alpha * alpha + beta;
     std::fill(std::begin(mean_weights) + 1, std::end(mean_weights), 1 / (2 * (DIM + lambda)));
     std::fill(
       std::begin(covariance_weights) + 1, std::end(covariance_weights), 1 / (2 * (DIM + lambda)));

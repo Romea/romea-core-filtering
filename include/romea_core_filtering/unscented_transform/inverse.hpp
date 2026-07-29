@@ -31,10 +31,14 @@ namespace core
 template<typename Scalar, size_t DIM>
 struct UnscentedTransformInverse
 {
+  using Parameters = UnscentedTransformParameters<Scalar>;
+  using Distribution = GaussianDistribution<Scalar, DIM>;
+  using SigmaPoints = typename Distribution::SigmaPoints;
+
   static void to_gaussian(
-    const UnscentedTransformParameters<Scalar> & parameters,
-    const typename GaussianDistribution<Scalar, DIM>::SigmaPoints & sigma_points,
-    GaussianDistribution<Scalar, DIM> & gaussian_distribution)
+    const Parameters & parameters,
+    const SigmaPoints & sigma_points,
+    Distribution & gaussian_distribution)
   {
     assert(parameters.mean_weights.size() == sigma_points.size());
 
@@ -59,10 +63,14 @@ struct UnscentedTransformInverse
 template<typename Scalar>
 struct UnscentedTransformInverse<Scalar, 1>
 {
+  using Parameters = UnscentedTransformParameters<Scalar>;
+  using Distribution = GaussianDistribution<Scalar, 1>;
+  using SigmaPoints = typename Distribution::SigmaPoints;
+
   static void to_gaussian(
-    const UnscentedTransformParameters<Scalar> & parameters,
-    const typename GaussianDistribution<Scalar, 1>::SigmaPoints & sigma_points,
-    GaussianDistribution<Scalar, 1> & gaussian_distribution)
+    const Parameters & parameters,
+    const SigmaPoints & sigma_points,
+    Distribution & gaussian_distribution)
   {
     assert(parameters.mean_weights.size() == sigma_points.size());
 

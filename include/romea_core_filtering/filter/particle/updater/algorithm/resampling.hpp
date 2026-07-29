@@ -41,6 +41,12 @@ enum class ParticleFilterResamplingScheme
   SYSTEMATIC,
 };
 
+struct ParticleFilterResamplingStatus
+{
+  double number_of_effective_samples = 0.;
+  bool resampled = false;
+};
+
 template<class Scalar, size_t DIM>
 class ParticleFilterResampling
 {
@@ -56,6 +62,12 @@ public:
     ParticleFilterState<Scalar, DIM> & state,
     const ParticleFilterResamplingScheme & resampling_type,
     const Scalar & number_of_effective_sample_threshold = 1.);
+
+  const ParticleFilterResamplingStatus & get_status() const;
+
+  double get_number_of_effective_samples() const;
+
+  bool has_resampled() const;
 
   void set_number_of_effective_sample_threshold(const Scalar & threshold);
 
@@ -79,6 +91,7 @@ protected:
   RowMajorVector state_cum_sum_weights_;
   RowMajorVector random_cum_sum_weights_;
   RowMajorMatrix resampled_particles_;
+  ParticleFilterResamplingStatus status_;
 
   std::mt19937_64 rng_;
   std::uniform_real_distribution<Scalar> uniform_distribution;
@@ -92,6 +105,7 @@ ParticleFilterResampling<Scalar, DIM>::ParticleFilterResampling(
   state_cum_sum_weights_(RowMajorVector::Zero(number_of_particles)),
   random_cum_sum_weights_(RowMajorVector::Zero(number_of_particles)),
   resampled_particles_(RowMajorMatrix::Zero(DIM, number_of_particles)),
+  status_(),
   rng_(rng_seed),
   uniform_distribution(0, 1)
 {
@@ -107,12 +121,37 @@ void ParticleFilterResampling<Scalar, DIM>::resampling(
   assert(size_t(state.particles.cols()) == number_of_particles_);
 
   normalize_state_weights_(state.weights);
-  double number_of_effective_samples = 1. / (state.weights.array().square().sum());
-  if (number_of_effective_samples < number_of_particles_ * number_of_effective_sample_threshold) {
+  status_.number_of_effective_samples = 1. / (state.weights.array().square().sum());
+  status_.resampled =
+    status_.number_of_effective_samples <
+    number_of_particles_ * number_of_effective_sample_threshold;
+
+  if (status_.resampled) {
     compute_state_sum_sum_weights_(state.weights);
     compute_random_cum_sum_weights_(resampling_scheme);
     resampling_(state);
   }
+}
+
+//-----------------------------------------------------------------------------
+template<typename Scalar, size_t DIM>
+const ParticleFilterResamplingStatus & ParticleFilterResampling<Scalar, DIM>::get_status() const
+{
+  return status_;
+}
+
+//-----------------------------------------------------------------------------
+template<typename Scalar, size_t DIM>
+double ParticleFilterResampling<Scalar, DIM>::get_number_of_effective_samples() const
+{
+  return status_.number_of_effective_samples;
+}
+
+//-----------------------------------------------------------------------------
+template<typename Scalar, size_t DIM>
+bool ParticleFilterResampling<Scalar, DIM>::has_resampled() const
+{
+  return status_.resampled;
 }
 
 //-----------------------------------------------------------------------------
@@ -205,12 +244,6 @@ void ParticleFilterResampling<Scalar, DIM>::compute_random_cum_sum_weights_(
 template<class Scalar, size_t DIM>
 void ParticleFilterResampling<Scalar, DIM>::resampling_(ParticleFilterState<Scalar, DIM> & state)
 {
-  std::cout << " resampling" << std::endl;
-  std::cout << state_cum_sum_weights_(0) << " " << state_cum_sum_weights_(number_of_particles_ - 1)
-            << std::endl;
-  std::cout << random_cum_sum_weights_(0) << " "
-            << random_cum_sum_weights_(number_of_particles_ - 1) << std::endl;
-
   size_t j = 0;
   for (size_t i = 0; i < number_of_particles_; ++i) {
     do {

@@ -54,6 +54,7 @@ protected:
 protected:
   Observations apriori_observations_;
   Observations apriori_mean_centered_observations_;
+  RawMajorVector squared_mahalanobis_distances_;
   GaussianObservation<Scalar, ObservationDIM> apriori_observation_;
 
   Eigen::Matrix<Scalar, ObservationDIM, 1> Inn_;
@@ -68,8 +69,9 @@ template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 PFGaussianUpdaterBase<Scalar, StateDIM, ObservationDIM>::PFGaussianUpdaterBase(
   const std::size_t & number_of_particles, const double & maximal_mahalanobis_distance)
 : PFUpdaterBase<Scalar, StateDIM, ObservationDIM>(number_of_particles),
-  apriori_observations_(),
-  apriori_mean_centered_observations_(),
+  apriori_observations_(Observations::Zero(ObservationDIM, number_of_particles)),
+  apriori_mean_centered_observations_(Observations::Zero(ObservationDIM, number_of_particles)),
+  squared_mahalanobis_distances_(RawMajorVector::Zero(number_of_particles)),
   apriori_observation_(),
   Inn_(),
   QInn_(),
@@ -114,19 +116,20 @@ bool PFGaussianUpdaterBase<Scalar, StateDIM, ObservationDIM>::update_state_(
   compute_innovation_(observation, state.weights);
   mahalanobis_distance_ = KFMahalanobis<Scalar, ObservationDIM>::compute(Inn_, QInn_, QInnInverse_);
   if (mahalanobis_distance_ < maximal_mahalanobis_distance_) {
+    squared_mahalanobis_distances_.setZero();
     for (int i = 0; i < ObservationDIM; ++i) {
-      state.weights *=
-        (-QInnInverse_(i, i) * (apriori_observations_.row(i) - observation.Y(i)).square() / 2.)
-          .exp();
+      const auto innovation_i = apriori_observations_.row(i) - observation.Y(i);
+      squared_mahalanobis_distances_ += QInnInverse_(i, i) * innovation_i.square();
 
-      for (int j = i; j < ObservationDIM; ++j) {
-        state.weights *= (-QInnInverse_(i, j) * (apriori_observations_.row(i) - observation.Y(i)) *
-                          (apriori_observations_.row(j) - observation.Y(j)))
-                           .exp();
+      for (int j = i + 1; j < ObservationDIM; ++j) {
+        const auto innovation_j = apriori_observations_.row(j) - observation.Y(j);
+        squared_mahalanobis_distances_ +=
+          2.0 * QInnInverse_(i, j) * innovation_i * innovation_j;
       }
     }
 
-    this->resampling_.resampling(state, ParticleFilterResamplingScheme::MUTINOMIAL, 0.8);
+    state.weights *= (-0.5 * squared_mahalanobis_distances_).exp();
+    this->resampling_.resampling(state, ParticleFilterResamplingScheme::SYSTEMATIC, 0.8);
     return true;
   } else {
     return false;
@@ -186,9 +189,10 @@ template<typename Scalar, size_t StateDIM>
 void PFGaussianUpdaterBase<Scalar, StateDIM, 1>::compute_innovation_(
   const Observation & observation, const WeightVector & weights)
 {
-  apriori_observation_.Y() = (apriori_observations_ * weights).sum();
+  const auto weight_sum = weights.sum();
+  apriori_observation_.Y() = (apriori_observations_ * weights).sum() / weight_sum;
   apriori_observation_.R() =
-    ((apriori_observations_ - apriori_observation_.Y()) * weights).square().sum();
+    ((apriori_observations_ - apriori_observation_.Y()).square() * weights).sum() / weight_sum;
   this->Inn_ = observation.Y() - apriori_observation_.Y();
   this->QInn_ = observation.R() + apriori_observation_.R();
 }
@@ -203,7 +207,7 @@ bool PFGaussianUpdaterBase<Scalar, StateDIM, 1>::update_state_(
   if (mahalanobis_distance_ < maximal_mahalanobis_distance_) {
     state.weights *=
       (-QInnInverse_ * (apriori_observations_ - observation.Y()).square() / 2.).exp();
-    this->resampling_.resampling(state, ParticleFilterResamplingScheme::MUTINOMIAL, 0.8);
+    this->resampling_.resampling(state, ParticleFilterResamplingScheme::SYSTEMATIC, 0.8);
     return true;
   } else {
     return false;

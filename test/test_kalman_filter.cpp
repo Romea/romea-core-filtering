@@ -66,8 +66,8 @@ romea::core::FilterMetaState<State, KalmanFSMState, Duration>::UpdateFunction ma
 
 TEST(TestKalmanFilter, storesGaussianStatesAndUsesRegisteredPredictor)
 {
-  romea::core::KalmanFilter<State, KalmanFSMState, Duration> filter(4);
-  filter.register_predictor(std::make_unique<ScalarPredictor>());
+  romea::core::KalmanFilter<State, KalmanFSMState, Duration> filter(
+    4, std::make_unique<ScalarPredictor>());
 
   filter.process(Duration(10), make_scalar_update(100., 4.));
 

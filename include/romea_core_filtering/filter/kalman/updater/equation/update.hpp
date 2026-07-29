@@ -29,12 +29,17 @@ namespace core
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 struct KFUpdateStateVector
 {
+  using Traits = KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>;
+  using X = typename Traits::X;
+  using Inn = typename Traits::Inn;
+  using K = typename Traits::K;
+
   static void compute(
-    typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::X & X,
-    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn & Inn,
-    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K & K)
+    X & state,
+    const Inn & innovation,
+    const K & gain)
   {
-    X += K * Inn;
+    state += gain * innovation;
   }
 };
 
@@ -42,12 +47,32 @@ struct KFUpdateStateVector
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 struct KFUpdateStateCovariance
 {
+  using Traits = KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>;
+  using P = typename Traits::P;
+  using QInn = typename Traits::QInn;
+  using H = typename Traits::H;
+  using K = typename Traits::K;
+
   static void compute(
-    typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::P & P,
-    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn & QInn,
-    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K & K)
+    P & covariance,
+    const QInn & innovation_covariance,
+    const K & gain)
   {
-    P -= K * QInn * K.transpose();
+    covariance -= gain * innovation_covariance * gain.transpose();
+    covariance = (covariance + covariance.transpose()) / 2.;
+  }
+
+  static void compute_joseph(
+    P & covariance,
+    const QInn & observation_covariance,
+    const H & observation_matrix,
+    const K & gain)
+  {
+    const auto I = P::Identity();
+    const auto IKH = I - gain * observation_matrix;
+    covariance = IKH * covariance * IKH.transpose() +
+      gain * observation_covariance * gain.transpose();
+    covariance = (covariance + covariance.transpose()) / 2.;
   }
 };
 
@@ -55,7 +80,13 @@ struct KFUpdateStateCovariance
 template<typename Scalar>
 struct KFUpdateStateCovariance<Scalar, 1, 1>
 {
-  static void compute(Scalar & P, const Scalar & QInn, const Scalar & K) { P -= K * QInn * K; }
+  static void compute(
+    Scalar & covariance,
+    const Scalar & innovation_covariance,
+    const Scalar & gain)
+  {
+    covariance -= gain * innovation_covariance * gain;
+  }
 };
 
 }  // namespace core

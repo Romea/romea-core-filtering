@@ -35,9 +35,15 @@ namespace core
 template<class State, class FSMState, class Duration>
 class ParticleFilter : public FilterBase<State, FSMState, Duration>
 {
+private:
+  using Base = FilterBase<State, FSMState, Duration>;
+
 public:
-  ParticleFilter(const size_t & state_pool_size, const size_t & number_of_particles)
-  : FilterBase<State, FSMState, Duration>(state_pool_size),
+  ParticleFilter(
+    const size_t & state_pool_size,
+    const size_t & number_of_particles,
+    typename Base::PredictorPtr predictor)
+  : Base(state_pool_size, std::move(predictor)),
     number_of_particles_(number_of_particles)
   {
     for (size_t n = 0; n < state_pool_size; ++n) {

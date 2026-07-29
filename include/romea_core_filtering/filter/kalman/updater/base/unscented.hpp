@@ -36,9 +36,13 @@ template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 class UKFUpdaterBase
 {
 public:
+  using Traits = KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>;
   using State = GaussianState<Scalar, StateDIM>;
   using Observation = GaussianObservation<Scalar, ObservationDIM>;
   using CorrelationMatrix = Eigen::Matrix<Scalar, StateDIM, ObservationDIM>;
+  using Inn = typename Traits::Inn;
+  using QInn = typename Traits::QInn;
+  using K = typename Traits::K;
 
 public:
   UKFUpdaterBase(
@@ -62,10 +66,10 @@ protected:
   typename GaussianDistribution<Scalar, ObservationDIM>::SigmaPoints propagated_sigma_points_;
   GaussianObservation<Scalar, ObservationDIM> propagated_state_;
 
-  typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn Inn_;
-  typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn QInn_;
-  typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn QInnInverse_;
-  typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K K_;
+  Inn Inn_;
+  QInn QInn_;
+  QInn QInnInverse_;
+  K K_;
 
   Scalar mahalanobis_distance_;
   Scalar maximal_mahalanobis_distance_;
@@ -82,10 +86,10 @@ UKFUpdaterBase<Scalar, StateDIM, ObservationDIM>::UKFUpdaterBase(
   state_sigma_points_(2 * StateDIM + 1),
   propagated_sigma_points_(2 * StateDIM + 1),
   propagated_state_(),
-  Inn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::Inn>::zero()),
-  QInn_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn>::zero()),
-  QInnInverse_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn>::zero()),
-  K_(Zero<typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K>::zero()),
+  Inn_(Zero<Inn>::zero()),
+  QInn_(Zero<QInn>::zero()),
+  QInnInverse_(Zero<QInn>::zero()),
+  K_(Zero<K>::zero()),
   mahalanobis_distance_(std::numeric_limits<Scalar>::max()),
   maximal_mahalanobis_distance_(maximal_mahalanobis_distance)
 {

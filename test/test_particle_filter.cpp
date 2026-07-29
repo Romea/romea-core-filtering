@@ -19,6 +19,7 @@
 #include <cmath>
 
 #include "romea_core_filtering/filter/particle/filter.hpp"
+#include "romea_core_filtering/filter/predictor_base.hpp"
 #include "romea_core_filtering/filter/particle/state.hpp"
 #include "romea_core_filtering/filter/particle/updater/algorithm/resampling.hpp"
 #include "romea_core_filtering/filter/particle/updater/base/gaussian.hpp"
@@ -34,13 +35,31 @@ enum class ParticleFSMState
   RUN
 };
 
+class ParticlePredictor
+: public romea::core::FilterPredictorBase<
+    romea::core::ParticleFilterState<double, 2>, ParticleFSMState, Duration>
+{
+public:
+  void predict(
+    const Duration &,
+    const ParticleFSMState & previous_fsm_state,
+    const romea::core::ParticleFilterState<double, 2> & previous_state,
+    const Duration &,
+    ParticleFSMState & current_fsm_state,
+    romea::core::ParticleFilterState<double, 2> & current_state) override
+  {
+    current_state = previous_state;
+    current_fsm_state = previous_fsm_state;
+  }
+};
+
 class TestParticleFilter
 : public romea::core::
     ParticleFilter<romea::core::ParticleFilterState<double, 2>, ParticleFSMState, Duration>
 {
 public:
   TestParticleFilter(const size_t & state_pool_size, const size_t & number_of_particles)
-  : ParticleFilter(state_pool_size, number_of_particles)
+  : ParticleFilter(state_pool_size, number_of_particles, std::make_unique<ParticlePredictor>())
   {
   }
 };
@@ -125,6 +144,11 @@ TEST(TestParticleResampling, normalizesWeightsEvenWhenResamplingIsNotNeeded)
   EXPECT_NEAR(state.weights(0), 0.2, 1e-12);
   EXPECT_NEAR(state.weights(1), 0.3, 1e-12);
   EXPECT_NEAR(state.weights(2), 0.5, 1e-12);
+  EXPECT_NEAR(
+    resampling.get_number_of_effective_samples(),
+    1. / (0.2 * 0.2 + 0.3 * 0.3 + 0.5 * 0.5),
+    1e-12);
+  EXPECT_FALSE(resampling.has_resampled());
 }
 
 TEST(TestParticleResampling, throwsOnDegenerateWeights)
@@ -151,6 +175,11 @@ TEST(TestParticleResampling, systematicResamplingProducesUniformWeights)
   for (int col = 0; col < state.weights.cols(); ++col) {
     EXPECT_DOUBLE_EQ(state.weights(col), 0.25);
   }
+  EXPECT_NEAR(
+    resampling.get_number_of_effective_samples(),
+    1. / (0.97 * 0.97 + 3 * 0.01 * 0.01),
+    1e-12);
+  EXPECT_TRUE(resampling.has_resampled());
 }
 
 TEST(TestPFGaussianUpdaterBase, acceptsCloseGaussianObservationAndResamples)

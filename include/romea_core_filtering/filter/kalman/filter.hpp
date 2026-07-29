@@ -31,9 +31,12 @@ namespace core
 template<class State, class FSMState, class Duration>
 class KalmanFilter : public FilterBase<State, FSMState, Duration>
 {
+private:
+  using Base = FilterBase<State, FSMState, Duration>;
+
 public:
-  explicit KalmanFilter(const size_t state_pool_size)
-  : FilterBase<State, FSMState, Duration>(state_pool_size)
+  KalmanFilter(const size_t state_pool_size, typename Base::PredictorPtr predictor)
+  : Base(state_pool_size, std::move(predictor))
   {
     for (size_t n = 0; n < state_pool_size; ++n) {
       std::unique_ptr<State> state(new State());

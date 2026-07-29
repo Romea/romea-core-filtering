@@ -28,13 +28,19 @@ namespace core
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 struct KFGain
 {
+  using Traits = KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>;
+  using P = typename Traits::P;
+  using H = typename Traits::H;
+  using QInn = typename Traits::QInn;
+  using K = typename Traits::K;
+
   static void compute(
-    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::P & P,
-    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::H & H,
-    const typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::QInn & QInnInverse,
-    typename KFUpdaterTraits<Scalar, StateDIM, ObservationDIM>::K & K)
+    const P & state_covariance,
+    const H & observation_matrix,
+    const QInn & innovation_covariance_inverse,
+    K & gain)
   {
-    K = P * H.transpose() * QInnInverse;
+    gain = state_covariance * observation_matrix.transpose() * innovation_covariance_inverse;
   }
 };
 

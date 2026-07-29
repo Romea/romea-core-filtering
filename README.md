@@ -39,9 +39,13 @@ The asynchronous filter base is the part that is common to all filtering familie
 | `FilterBase` | `filter/filter_base.hpp` | Asynchronous filter base that stores timestamped states and applies prediction/update steps. |
 | `FilterMetaState` | `filter/meta_state.hpp` | Timestamped state, finite-state-machine state and update callback. |
 | `FilterPredictorBase` | `filter/predictor_base.hpp` | Partially defined prediction interface. Derived predictors provide the prediction model. |
+| `FilterUpdateProcessResult` | `filter/filter_base.hpp` | Result returned when inserting a timestamped update. |
+| `FilterStateQueryResult` | `filter/filter_base.hpp` | Result returned when querying a state at a requested timestamp. |
 | `FilterType` | `filter/type.hpp` | Enumeration used by client libraries to select a filtering family. |
 
 `FilterBase` is independent of the mathematical representation of the state. The same asynchronous filtering logic can therefore be used with Gaussian states, particle states or other state representations, as long as the derived package provides compatible predictors and update functions.
+
+Predictors are provided to the filter constructor. This keeps every concrete filter valid as soon as it is created. A predictor may also expose a finite extrapolation horizon through `maximal_extrapolation_duration()`. When a queried timestamp is too far after the last stored state, `get_state()` returns `FilterStateQueryResult::Status::TOO_FAR` instead of extrapolating indefinitely.
 
 ### 2.2) Kalman filters
 
@@ -128,28 +132,29 @@ A domain package usually defines:
 * one or more updater classes derived from the Kalman or particle updater base classes;
 * result extraction helpers.
 
-A complete filter is then assembled by creating the filter object, registering the predictor and inserting timestamped update functions:
+A complete filter is then assembled by creating the predictor, passing it to the filter constructor
+and inserting timestamped update functions:
 
 ```cpp
 #include "romea_core_filtering/filter/kalman/filter.hpp"
 
 using Duration = std::chrono::steady_clock::duration;
 
+auto predictor = std::make_unique<MyPredictor>(...);
+
 auto filter =
   std::make_unique<romea::core::KalmanFilter<State, FSMState, Duration>>(
-    state_pool_size);
-
-auto predictor = std::make_unique<MyPredictor>(...);
-filter->register_predictor(std::move(predictor));
+    state_pool_size,
+    std::move(predictor));
 
 // ...
 
-filter->process(observation_time, std::move(update_function));
+const auto process_result = filter->process(observation_time, std::move(update_function));
 
 // ...
 
 State current_state;
-filter->get_state(query_time, &current_state);
+const auto query = filter->get_state(query_time, &current_state);
 ```
 
 The filtering package provides the asynchronous filter base and the reusable equations. The application package provides `State`, `FSMState`, `MyPredictor` and the update functions.

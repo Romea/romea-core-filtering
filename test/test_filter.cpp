@@ -62,9 +62,9 @@ class TimerFilter : public romea::core::FilterBase<TimeState, TimeFSMState, Dura
 {
 public:
   explicit TimerFilter(const size_t & state_pool_size)
-  : romea::core::FilterBase<TimeState, TimeFSMState, Duration>(state_pool_size)
+  : romea::core::FilterBase<TimeState, TimeFSMState, Duration>(
+      state_pool_size, std::make_unique<TimePredictor>())
   {
-    register_predictor(std::make_unique<TimePredictor>());
     for (size_t n = 0; n < state_pool_size; ++n) {
       state_vector_pool_.push_back(std::make_unique<TimeState>());
     }

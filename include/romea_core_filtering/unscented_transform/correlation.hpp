@@ -28,14 +28,20 @@ namespace core
 template<typename Scalar, size_t StateDIM, size_t ObservationDIM>
 struct UKFCorrelation
 {
+  using Parameters = UnscentedTransformParameters<Scalar>;
+  using State = GaussianState<Scalar, StateDIM>;
+  using Observation = GaussianObservation<Scalar, ObservationDIM>;
+  using StateSigmaPoints = typename State::SigmaPoints;
+  using ObservationSigmaPoints = typename Observation::SigmaPoints;
+  using CorrelationMatrix = Eigen::Matrix<Scalar, StateDIM, ObservationDIM>;
+
   static void compute(
-    const UnscentedTransformParameters<Scalar> & parameters,
-    const GaussianState<Scalar, StateDIM> & state,
-    const GaussianObservation<Scalar, ObservationDIM> & propagatedState,
-    const typename GaussianState<Scalar, StateDIM>::SigmaPoints & stateSigmaPoints,
-    const typename GaussianDistribution<Scalar, ObservationDIM>::SigmaPoints &
-      propagatedSigmaPoints,
-    Eigen::Matrix<Scalar, StateDIM, ObservationDIM> & correlationMatrix)
+    const Parameters & parameters,
+    const State & state,
+    const Observation & propagatedState,
+    const StateSigmaPoints & stateSigmaPoints,
+    const ObservationSigmaPoints & propagatedSigmaPoints,
+    CorrelationMatrix & correlationMatrix)
   {
     assert(stateSigmaPoints.size() == 2 * StateDIM + 1);
     assert(propagatedSigmaPoints.size() == 2 * StateDIM + 1);
@@ -56,13 +62,20 @@ struct UKFCorrelation
 template<typename Scalar, size_t StateDIM>
 struct UKFCorrelation<Scalar, StateDIM, 1>
 {
+  using Parameters = UnscentedTransformParameters<Scalar>;
+  using State = GaussianState<Scalar, StateDIM>;
+  using Observation = GaussianObservation<Scalar, 1>;
+  using StateSigmaPoints = typename State::SigmaPoints;
+  using ObservationSigmaPoints = typename Observation::SigmaPoints;
+  using CorrelationMatrix = Eigen::Matrix<Scalar, StateDIM, 1>;
+
   static void compute(
-    const UnscentedTransformParameters<Scalar> & parameters,
-    const GaussianState<Scalar, StateDIM> & state,
-    const GaussianObservation<Scalar, 1> & propagatedState,
-    const typename GaussianState<Scalar, StateDIM>::SigmaPoints & stateSigmaPoints,
-    const typename GaussianObservation<Scalar, 1>::SigmaPoints & propagatedSigmaPoints,
-    Eigen::Matrix<Scalar, StateDIM, 1> & correlationMatrix)
+    const Parameters & parameters,
+    const State & state,
+    const Observation & propagatedState,
+    const StateSigmaPoints & stateSigmaPoints,
+    const ObservationSigmaPoints & propagatedSigmaPoints,
+    CorrelationMatrix & correlationMatrix)
   {
     assert(stateSigmaPoints.size() == 2 * StateDIM + 1);
     assert(propagatedSigmaPoints.size() == 2 * StateDIM + 1);
@@ -83,12 +96,18 @@ struct UKFCorrelation<Scalar, StateDIM, 1>
 template<typename Scalar>
 struct UKFCorrelation<Scalar, 1, 1>
 {
+  using Parameters = UnscentedTransformParameters<Scalar>;
+  using State = GaussianState<Scalar, 1>;
+  using Observation = GaussianObservation<Scalar, 1>;
+  using StateSigmaPoints = typename State::SigmaPoints;
+  using ObservationSigmaPoints = typename Observation::SigmaPoints;
+
   static void compute(
-    const UnscentedTransformParameters<Scalar> & parameters,
-    const GaussianState<Scalar, 1> & state,
-    const GaussianObservation<Scalar, 1> & propagatedState,
-    const typename GaussianState<Scalar, 1>::SigmaPoints & stateSigmaPoints,
-    const typename GaussianObservation<Scalar, 1>::SigmaPoints & propagatedSigmaPoints,
+    const Parameters & parameters,
+    const State & state,
+    const Observation & propagatedState,
+    const StateSigmaPoints & stateSigmaPoints,
+    const ObservationSigmaPoints & propagatedSigmaPoints,
     double & correlationMatrix)
   {
     assert(stateSigmaPoints.size() == 3);

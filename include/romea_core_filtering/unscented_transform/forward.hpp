@@ -34,10 +34,17 @@ namespace core
 template<typename Scalar, size_t DIM>
 struct UnscentedTransformForward
 {
+  using Parameters = UnscentedTransformParameters<Scalar>;
+  using Distribution = GaussianDistribution<Scalar, DIM>;
+  using SigmaPoints = typename Distribution::SigmaPoints;
+  using DynamicMatrix = Eigen::Matrix<Scalar, -1, -1>;
+  using SVD = Eigen::JacobiSVD<DynamicMatrix>;
+  using Vector = Eigen::Matrix<Scalar, DIM, 1>;
+
   static void to_sigma_points(
-    const UnscentedTransformParameters<Scalar> & parameters,
-    const GaussianDistribution<Scalar, DIM> & gaussian_distribution,
-    typename GaussianDistribution<Scalar, DIM>::SigmaPoints & sigma_points)
+    const Parameters & parameters,
+    const Distribution & gaussian_distribution,
+    SigmaPoints & sigma_points)
   {
     assert(sigma_points.size() == parameters.mean_weights.size());
 
@@ -45,13 +52,10 @@ struct UnscentedTransformForward
     const auto & first_moment = gaussian_distribution.first_moment;
     const auto & second_moment = gaussian_distribution.second_moment;
 
-    Eigen::JacobiSVD<Eigen::Matrix<Scalar, -1, -1>> svd(
-      second_moment, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    SVD svd(second_moment, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
-    auto sqrCovariance =
-      svd.matrixU() *
-      Eigen::Matrix<Scalar, DIM, 1>(svd.singularValues().array().sqrt()).asDiagonal() *
-      svd.matrixV().transpose();
+    auto sqrCovariance = svd.matrixU() * Vector(svd.singularValues().array().sqrt()).asDiagonal() *
+                         svd.matrixV().transpose();
 
     sigma_points[0] = first_moment;
     for (size_t n = 0; n < DIM; ++n) {
