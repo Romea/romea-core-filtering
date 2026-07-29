@@ -35,13 +35,19 @@ private:
   using Base = FilterBase<State, FSMState, Duration>;
 
 public:
-  KalmanFilter(const size_t state_pool_size, typename Base::PredictorPtr predictor)
-  : Base(state_pool_size, std::move(predictor))
+  explicit KalmanFilter(const size_t state_pool_size)
+  : Base(state_pool_size)
   {
     for (size_t n = 0; n < state_pool_size; ++n) {
       std::unique_ptr<State> state(new State());
       this->state_vector_pool_.push_back(std::move(state));
     }
+  }
+
+  KalmanFilter(const size_t state_pool_size, typename Base::PredictorPtr predictor)
+  : KalmanFilter(state_pool_size)
+  {
+    this->register_predictor(std::move(predictor));
   }
 
   virtual ~KalmanFilter() = default;

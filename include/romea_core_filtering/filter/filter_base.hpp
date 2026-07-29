@@ -84,11 +84,15 @@ public:
   using UpdateFunction = typename FilterMetaState<State, FSMState, Duration>::UpdateFunction;
 
 public:
+  explicit FilterBase(const size_t & poolSize);
+
   FilterBase(const size_t & poolSize, PredictorPtr predictor);
 
   virtual ~FilterBase() = default;
 
 public:
+  void register_predictor(PredictorPtr predictor);
+
   FilterStateQueryResult<FSMState> get_state(const Duration & duration, State * state);
 
   FilterUpdateProcessResult process(const Duration & duration, UpdateFunction && update_function);
@@ -107,12 +111,31 @@ protected:
 
 //-----------------------------------------------------------------------------
 template<class State, class FSMState, class Duration>
+FilterBase<State, FSMState, Duration>::FilterBase(const size_t & state_pool_size)
+: meta_states_(), state_vector_pool_(), predictor_(nullptr), mutex_()
+{
+  state_vector_pool_.reserve(state_pool_size);
+}
+
+//-----------------------------------------------------------------------------
+template<class State, class FSMState, class Duration>
 FilterBase<State, FSMState, Duration>::FilterBase(
   const size_t & state_pool_size, PredictorPtr predictor)
-: meta_states_(), state_vector_pool_(), predictor_(std::move(predictor)), mutex_()
+: FilterBase(state_pool_size)
 {
-  assert(predictor_);
-  state_vector_pool_.reserve(state_pool_size);
+  register_predictor(std::move(predictor));
+}
+
+//-----------------------------------------------------------------------------
+template<class State, class FSMState, class Duration>
+void FilterBase<State, FSMState, Duration>::register_predictor(PredictorPtr predictor)
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  assert(predictor && "cannot register a null predictor");
+  assert(!predictor_ && "predictor is already registered");
+
+  predictor_ = std::move(predictor);
 }
 
 //-----------------------------------------------------------------------------
@@ -140,6 +163,7 @@ FilterStateQueryResult<FSMState> FilterBase<State, FSMState, Duration>::get_stat
   std::lock_guard<std::mutex> lock(mutex_);
 
   assert(state);
+  assert(predictor_);
 
   // If no metaStates have been inserted
   if (meta_states_.empty()) {
@@ -188,6 +212,7 @@ FilterUpdateProcessResult FilterBase<State, FSMState, Duration>::process(
 {
   std::lock_guard<std::mutex> lock(mutex_);
   assert(!state_vector_pool_.empty());
+  assert(predictor_);
 
   auto I = std::begin(meta_states_);
   if (!meta_states_.empty()) {

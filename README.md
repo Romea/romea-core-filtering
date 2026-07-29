@@ -45,8 +45,6 @@ The asynchronous filter base is the part that is common to all filtering familie
 
 `FilterBase` is independent of the mathematical representation of the state. The same asynchronous filtering logic can therefore be used with Gaussian states, particle states or other state representations, as long as the derived package provides compatible predictors and update functions.
 
-Predictors are provided to the filter constructor. This keeps every concrete filter valid as soon as it is created. A predictor may also expose a finite extrapolation horizon through `maximal_extrapolation_duration()`. When a queried timestamp is too far after the last stored state, `get_state()` returns `FilterStateQueryResult::Status::TOO_FAR` instead of extrapolating indefinitely.
-
 ### 2.2) Kalman filters
 
 `KalmanFilter<State, FSMState, Duration>` implements the Kalman-filter variant of the asynchronous prediction/update workflow.
@@ -132,8 +130,7 @@ A domain package usually defines:
 * one or more updater classes derived from the Kalman or particle updater base classes;
 * result extraction helpers.
 
-A complete filter is then assembled by creating the predictor, passing it to the filter constructor
-and inserting timestamped update functions:
+A complete filter is then assembled by creating or registering the predictor, then inserting timestamped update functions:
 
 ```cpp
 #include "romea_core_filtering/filter/kalman/filter.hpp"
@@ -150,12 +147,35 @@ auto filter =
 // ...
 
 const auto process_result = filter->process(observation_time, std::move(update_function));
+if (!process_result) {
+  // The update was outside the retained history and was not inserted.
+}
 
 // ...
 
 State current_state;
 const auto query = filter->get_state(query_time, &current_state);
+if (query.status == decltype(query)::Status::AVAILABLE) {
+  // current_state contains the predicted state at query_time.
+}
 ```
+
+Update insertion is explicit as well. `process()` returns a `FilterUpdateProcessResult`:
+
+| Status | Meaning |
+| ------ | ------- |
+| `ACCEPTED` | The update was inserted and the affected part of the state history was recomputed. |
+| `TOO_OLD` | The update was older than the retained state history and was not inserted. |
+
+State queries are explicit about why a result can or cannot be returned. `get_state()` fills the user-provided state only when it returns `FilterStateQueryResult::Status::AVAILABLE`. Otherwise, the returned status explains the failure:
+
+| Status | Meaning |
+| ------ | ------- |
+| `EMPTY` | No observation/update has been inserted yet, so the filter has no stored state. |
+| `TOO_OLD` | The requested timestamp is older than the retained state history. |
+| `TOO_FAR` | The requested timestamp is after the last stored state by more than the predictor accepts. |
+
+The `TOO_FAR` case is controlled by the predictor through `maximal_extrapolation_duration()`. The default duration is unbounded, but domain predictors can expose a finite horizon to avoid producing results from stale data when a caller queries far into the future.
 
 The filtering package provides the asynchronous filter base and the reusable equations. The application package provides `State`, `FSMState`, `MyPredictor` and the update functions.
 

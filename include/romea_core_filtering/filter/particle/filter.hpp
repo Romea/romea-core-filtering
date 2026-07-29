@@ -41,15 +41,23 @@ private:
 public:
   ParticleFilter(
     const size_t & state_pool_size,
-    const size_t & number_of_particles,
-    typename Base::PredictorPtr predictor)
-  : Base(state_pool_size, std::move(predictor)),
+    const size_t & number_of_particles)
+  : Base(state_pool_size),
     number_of_particles_(number_of_particles)
   {
     for (size_t n = 0; n < state_pool_size; ++n) {
       std::unique_ptr<State> state(new State(number_of_particles));
       this->state_vector_pool_.push_back(std::move(state));
     }
+  }
+
+  ParticleFilter(
+    const size_t & state_pool_size,
+    const size_t & number_of_particles,
+    typename Base::PredictorPtr predictor)
+  : ParticleFilter(state_pool_size, number_of_particles)
+  {
+    this->register_predictor(std::move(predictor));
   }
 
   virtual ~ParticleFilter() = default;
